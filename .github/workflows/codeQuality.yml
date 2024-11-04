@@ -35,6 +35,13 @@ jobs:
           key: ${{ runner.os }}-m2-jdk${{ matrix.java }}-${{ hashFiles('**/pom.xml', '**/*.yml') }}
           restore-keys: ${{ runner.os }}-m2-
 
+      - name: Cache Sonar Packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       - name: Build with Maven
         run: |
             mvn clean verify -Pjacoco
@@ -55,3 +62,7 @@ jobs:
         uses: coverallsapp/github-action@v2
         env:
          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: SonarCloud
+        run: mvn sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+        working-directory: ${{ env.workdir }}
