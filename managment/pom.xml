@@ -18,6 +18,7 @@
 		<assertj.version>3.26.3</assertj.version>
 		<hibernate.version>6.6.1.Final</hibernate.version>
 		<h2.version>2.3.232</h2.version>
+		<jacoco.version>0.8.12</jacoco.version>
 	</properties>
 
 	<dependencyManagement>
@@ -107,7 +108,41 @@
 					<artifactId>maven-project-info-reports-plugin</artifactId>
 					<version>3.6.1</version>
 				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco.version}</version>
+					<configuration>
+						<excludes>
+							<exclude>**/model/*</exclude>
+							<exclude>**/app/*</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<goals>
+								<!-- binds by default to the phase "initialize" -->
+								<goal>prepare-agent</goal>
+								<!-- binds by default to the phase "verify" -->
+								<goal>report</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
+	<profiles>
+		<profile>
+			<id>jacoco</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
