@@ -14,11 +14,25 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>11</maven.compiler.release>
+		<!-- Sonar -->
+		<sonar.version>4.0.0.4121</sonar.version>
+		<sonar.organization>cmancio00</sonar.organization>
+		<sonar.projectKey>cMancio00_order-managment</sonar.projectKey>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.coverage.exclusions>
+			**/model/*,
+			**/app/*
+		</sonar.coverage.exclusions>
+		<sonar.junit.reportPaths>
+			${project.build.directory}/surefire-reports
+		</sonar.junit.reportPaths>
+		<!-- end Sonar-->
 		<jupiter.version>5.11.2</jupiter.version>
 		<assertj.version>3.26.3</assertj.version>
 		<hibernate.version>6.6.1.Final</hibernate.version>
 		<h2.version>2.3.232</h2.version>
 		<jacoco.version>0.8.12</jacoco.version>
+
 	</properties>
 
 	<dependencyManagement>
@@ -128,6 +142,11 @@
 							</goals>
 						</execution>
 					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>${sonar.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
