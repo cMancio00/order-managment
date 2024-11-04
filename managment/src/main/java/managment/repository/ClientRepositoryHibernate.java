@@ -1,7 +1,6 @@
 package managment.repository;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 import managment.model.Client;
 
