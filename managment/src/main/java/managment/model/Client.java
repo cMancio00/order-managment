@@ -1,5 +1,7 @@
 package managment.model;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,14 +20,31 @@ public class Client {
 	private String name;
 	
 	// Empty constructor for hibernate
-	private Client() {};
+	public Client() {};
 	
-	private Client(int id, String name) {
+	public Client(int id, String name) {
 		this.id = id;
 		this.name = name;
 	}
 	
-	private Client(String name) {
+	public Client(String name) {
 		this.name = name;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Client))
+			return false;
+		Client other = (Client) obj;
+		return id == other.id && Objects.equals(name, other.name);
+	}
+	
+	
 }
