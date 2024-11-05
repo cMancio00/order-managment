@@ -15,4 +15,10 @@ public class ClientRepositoryHibernate implements ClientRepository {
 	public Client findById(int id, Session session) {
 		return session.find(Client.class, id);
 	}
+
+	@Override
+	public void delete(Client toDelete, Session session) {
+		session.remove(toDelete);
+		
+	}
 }

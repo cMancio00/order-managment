@@ -30,6 +30,10 @@ public class Client {
 	public Client(String name) {
 		this.name = name;
 	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	@Override
 	public int hashCode() {
@@ -46,9 +50,9 @@ public class Client {
 		return id == other.id && Objects.equals(name, other.name);
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	public String toString() {
+		return "Client [id=" + id + ", name=" + name + "]";
 	}
-	
-	
+
 }

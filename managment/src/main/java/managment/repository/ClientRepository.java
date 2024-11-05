@@ -10,4 +10,6 @@ public interface ClientRepository {
 
 	Client findById(int id, Session session);
 
+	void delete(Client toDelete, Session session);
+
 }
