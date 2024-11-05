@@ -1,8 +1,6 @@
 package managment.repository;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -54,6 +52,17 @@ class ClientRepositoryHibernateTest {
 				return clientRepository.findById(1,session);
 			});
 			assertThat(found).isEqualTo(new Client(1,"toBeFound"));
+		}
+		
+		@DisplayName("Update when Client is present")
+		@Test
+		void testUpdate(){
+			sessionFactory.inTransaction(session -> session.persist(new Client("testClient")));
+			Client toUpdate = sessionFactory.fromSession(session -> 
+				session.find(Client.class, 1));
+			toUpdate.setName("updatedName");
+			sessionFactory.inTransaction(session -> clientRepository.save(toUpdate, session));
+			assertThat(readAllClientFromDatabase()).containsExactly(new Client(1,"updatedName"));
 		}
 		
 	}
