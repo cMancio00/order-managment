@@ -1,6 +1,7 @@
 package managment.repository;
 
 import static org.assertj.core.api.Assertions.*;
+
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -76,6 +77,25 @@ class ClientRepositoryHibernateTest {
 			});
 			assertThat(readAllClientFromDatabase()).containsExactly(new Client(1,"notToBeDeleted"));
 		}
+		
+		@DisplayName("Find all when database is empty should return an empty list")
+		@Test
+		void testFindAllWhenDatabaseIsEmpty(){
+			List<Client> clients = sessionFactory.fromSession(session ->
+				 clientRepository.findAll(session));
+			assertThat(clients).isEmpty();
+		}
+		
+		@Test
+		void testFindAllWhenClientsArePresent(){
+			addTestClientToDatabase("firstClient");
+			addTestClientToDatabase("secondClient");
+			List<Client> clients = sessionFactory.fromSession(session -> clientRepository.findAll(session));
+			assertThat(clients).containsExactly(
+					new Client(1,"firstClient"),
+					new Client(2,"secondClient")
+					);
+		}
 	
 	}
 	@Nested
@@ -92,7 +112,6 @@ class ClientRepositoryHibernateTest {
 	
 	}
 	
-
 	private List<Client> readAllClientFromDatabase() {
 		return sessionFactory
 				.fromSession(session -> session.createSelectionQuery("from Client", Client.class).getResultList());
