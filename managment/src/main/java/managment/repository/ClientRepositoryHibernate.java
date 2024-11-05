@@ -10,4 +10,9 @@ public class ClientRepositoryHibernate implements ClientRepository {
 	public void save(Client client, Session session) {
 		session.merge(client);
 	}
+
+	@Override
+	public Client findById(int id, Session session) {
+		return session.find(Client.class, id);
+	}
 }

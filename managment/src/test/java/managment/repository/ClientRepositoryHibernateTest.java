@@ -1,6 +1,7 @@
 package managment.repository;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -8,10 +9,13 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import managment.model.Client;
 
+@DisplayName("Client Repository")
 class ClientRepositoryHibernateTest {
 	private static final String H2_DATABASE = "test-db";
 	private static final String CONNECTION_URL = String.format("jdbc:h2:mem:%s", H2_DATABASE);
@@ -31,13 +35,40 @@ class ClientRepositoryHibernateTest {
 		sessionFactory.getSchemaManager().truncateMappedObjects();
 		sessionFactory.close();
 	}
-
-	@Test
-	void testSave() {
-		sessionFactory.inTransaction(session -> 
-		clientRepository.save(new Client("toAdd"), session));
-		assertThat(readAllClientFromDatabase()).containsExactly(new Client(1, "toAdd"));
+	@Nested
+	@DisplayName("Happy Cases")
+	class HappyCases{
+		
+		@DisplayName("Save when database is empty")
+		@Test
+		void testSave() {
+			sessionFactory.inTransaction(session -> 
+			clientRepository.save(new Client("toAdd"), session));
+			assertThat(readAllClientFromDatabase()).containsExactly(new Client(1, "toAdd"));
+		}
+		@DisplayName("Find by id when Client is preset")
+		@Test
+		void testFindByIdWhenIsPresent(){
+			Client found = sessionFactory.fromTransaction(session -> {
+				session.persist(new Client("toBeFound"));
+				return clientRepository.findById(1,session);
+			});
+			assertThat(found).isEqualTo(new Client(1,"toBeFound"));
+		}
+		
 	}
+	@Nested
+	@DisplayName("Error Cases")
+	class ErrorCases{
+		@Test
+		void testFindByIdWhenIsNotPresent(){
+			Client found = sessionFactory.fromTransaction(session -> {
+				return clientRepository.findById(1,session);
+			});
+			assertThat(found).isNull();
+		}
+	}
+	
 
 	private List<Client> readAllClientFromDatabase() {
 		return sessionFactory
