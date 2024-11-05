@@ -44,7 +44,7 @@ jobs:
 
       - name: Build with Maven
         run: |
-            mvn clean verify -Pjacoco
+            mvn clean verify -Pjacoco,mutation-testing
         working-directory: ${{ env.workdir }}
 
       - name: Generate JUnit Report
@@ -66,3 +66,15 @@ jobs:
       - name: SonarCloud
         run: mvn sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         working-directory: ${{ env.workdir }}
+
+      - name: Archive mutation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pit-report-jdk-17
+          path: '**/target/pit-reports'
+          compression-level: 9
+      - name: Upload Pit report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: '**/target/pit-reports'
