@@ -20,7 +20,7 @@ public class Client {
 	private String name;
 	
 	// Empty constructor for hibernate
-	public Client() {};
+	public Client() {}
 	
 	public Client(int id, String name) {
 		this.id = id;
@@ -28,6 +28,10 @@ public class Client {
 	}
 	
 	public Client(String name) {
+		this.name = name;
+	}
+	
+	public void setName(String name) {
 		this.name = name;
 	}
 
@@ -45,6 +49,10 @@ public class Client {
 		Client other = (Client) obj;
 		return id == other.id && Objects.equals(name, other.name);
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "Client [id=" + id + ", name=" + name + "]";
+	}
+
 }
