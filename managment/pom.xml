@@ -32,6 +32,8 @@
 		<hibernate.version>6.6.1.Final</hibernate.version>
 		<h2.version>2.3.232</h2.version>
 		<jacoco.version>0.8.12</jacoco.version>
+		<pit.version>1.15.2</pit.version>
+		<pit.jupiter.version>1.2.1</pit.jupiter.version>
 
 	</properties>
 
@@ -151,12 +153,12 @@
 				<plugin>
 					<groupId>org.pitest</groupId>
 					<artifactId>pitest-maven</artifactId>
-					<version>1.15.2</version>
+					<version>${pit.version}</version>
 					<dependencies>
 						<dependency>
 							<groupId>org.pitest</groupId>
 							<artifactId>pitest-junit5-plugin</artifactId>
-							<version>1.2.1</version>
+							<version>${pit.jupiter.version}</version>
 						</dependency>
 					</dependencies>
 					<configuration>
