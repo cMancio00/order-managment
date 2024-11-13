@@ -68,7 +68,7 @@ class OrderRepositoryHibernateTest {
 	@Nested
 	@DisplayName("Error Cases")
 	class ErrorCases{
-		@DisplayName("Find by Id when Order is not present should return null")
+		@DisplayName("Find by Id when Order is not present should return empty optional")
 		@Test
 		void testFindByIdWhenIsNotPresent(){
 			Optional<Order> found = sessionFactory.fromTransaction(session -> {
