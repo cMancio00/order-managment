@@ -15,23 +15,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import managment.model.Order;
+import managment.model.Purchase;
+import managment.repository.purchase.PurchaseRepository;
+import managment.repository.purchase.PurchaseRepositoryHibernate;
 
-@DisplayName("Order Repository")
+@DisplayName("Purchase Repository")
 class OrderRepositoryHibernateTest {
-	private static final String H2_DATABASE = "order-test-db";
+	private static final String H2_DATABASE = "purchase-test-db";
 	private static final String CONNECTION_URL = String.format("jdbc:h2:mem:%s", H2_DATABASE);
 	private static final LocalDateTime FIRST_TEST_DATE = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 	private static final LocalDateTime SECOND_TEST_DATE = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 	private SessionFactory sessionFactory;
-	private OrderRepository orderRepository;
+	private PurchaseRepository purchaseRepository;
 
 	@BeforeEach
 	void setUpDatabase() throws Exception {
 		Configuration configuration = new Configuration();
 		configuration.setProperty("hibernate.connection.url", CONNECTION_URL);
 		sessionFactory = configuration.configure("hibernate-unit.cfg.xml").buildSessionFactory();
-		orderRepository = new OrderRepositoryHibernate();
+		purchaseRepository = new PurchaseRepositoryHibernate();
 	}
 
 	@AfterEach
@@ -48,54 +50,54 @@ class OrderRepositoryHibernateTest {
 		@Test
 		void testSave() {
 			sessionFactory.inTransaction(session -> 
-			orderRepository.save(new Order(FIRST_TEST_DATE, 10.0), session));
-			assertThat(readAllOrdersFromDatabase()).containsExactly(new Order(1, FIRST_TEST_DATE, 10.0));
+			purchaseRepository.save(new Purchase(FIRST_TEST_DATE, 10.0), session));
+			assertThat(readAllOrdersFromDatabase()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
 		}
-		@DisplayName("Find by id when Order is preset")
+		@DisplayName("Find by id when Purchase is preset")
 		@Test
 		void testFindByIdWhenIsPresent(){
-			Order notToBeFound = new Order(FIRST_TEST_DATE, 10.0);
-			Order toBeFound = new Order(SECOND_TEST_DATE, 5.0);
+			Purchase notToBeFound = new Purchase(FIRST_TEST_DATE, 10.0);
+			Purchase toBeFound = new Purchase(SECOND_TEST_DATE, 5.0);
 			addOrderToDataBase(notToBeFound);
 			addOrderToDataBase(toBeFound);
-			Optional<Order> found = sessionFactory.fromTransaction(session -> {
-				return orderRepository.findById(2, session);
+			Optional<Purchase> found = sessionFactory.fromTransaction(session -> {
+				return purchaseRepository.findById(2, session);
 			});
-			assertThat(found).contains(new Order(2, SECOND_TEST_DATE, 5.0));
+			assertThat(found).contains(new Purchase(2, SECOND_TEST_DATE, 5.0));
 		}
 		
-		@DisplayName("Delete Order when is present")
+		@DisplayName("Delete Purchase when is present")
 		@Test
 		void testDeleteWhenClientIsPresent(){
-			Order notToDeleted = new Order(FIRST_TEST_DATE, 10.0);
-			Order toBeDeleted = new Order(SECOND_TEST_DATE, 5.0);
+			Purchase notToDeleted = new Purchase(FIRST_TEST_DATE, 10.0);
+			Purchase toBeDeleted = new Purchase(SECOND_TEST_DATE, 5.0);
 			addOrderToDataBase(notToDeleted);
 			addOrderToDataBase(toBeDeleted);
 			sessionFactory.inTransaction(session -> {
-				Order toDelete = session.find(Order.class, 2);
-				orderRepository.delete(toDelete, session);
+				Purchase toDelete = session.find(Purchase.class, 2);
+				purchaseRepository.delete(toDelete, session);
 			});
-			assertThat(readAllOrdersFromDatabase()).containsExactly(new Order(1, FIRST_TEST_DATE, 10.0));
+			assertThat(readAllOrdersFromDatabase()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
 		}
 		
 		@DisplayName("Find all when database is empty should return an empty list")
 		@Test
 		void testFindAllWhenDatabaseIsEmpty(){
-			List<Order> clients = sessionFactory.fromSession(session ->
-				 orderRepository.findAll(session));
+			List<Purchase> clients = sessionFactory.fromSession(session ->
+				 purchaseRepository.findAll(session));
 			assertThat(clients).isEmpty();
 		}
-		@DisplayName("Find all when orders are present should return the list of orders")
+		@DisplayName("Find all when purchases are present should return the list of purchases")
 		@Test
 		void testFindAllWhenClientsArePresent(){
-			Order firstOrder = new Order(FIRST_TEST_DATE, 10.0);
-			Order secondOrder = new Order(SECOND_TEST_DATE, 5.0);
+			Purchase firstOrder = new Purchase(FIRST_TEST_DATE, 10.0);
+			Purchase secondOrder = new Purchase(SECOND_TEST_DATE, 5.0);
 			addOrderToDataBase(firstOrder);
 			addOrderToDataBase(secondOrder);
-			List<Order> orders = sessionFactory.fromSession(session -> orderRepository.findAll(session));
+			List<Purchase> orders = sessionFactory.fromSession(session -> purchaseRepository.findAll(session));
 			assertThat(orders).containsExactly(
-					new Order(1, FIRST_TEST_DATE, 10.0),
-					new Order(2, SECOND_TEST_DATE, 5.0)
+					new Purchase(1, FIRST_TEST_DATE, 10.0),
+					new Purchase(2, SECOND_TEST_DATE, 5.0)
 				);
 		}
 	}
@@ -103,22 +105,22 @@ class OrderRepositoryHibernateTest {
 	@Nested
 	@DisplayName("Error Cases")
 	class ErrorCases{
-		@DisplayName("Find by Id when Order is not present should return empty optional")
+		@DisplayName("Find by Id when Purchase is not present should return empty optional")
 		@Test
 		void testFindByIdWhenIsNotPresent(){
-			Optional<Order> found = sessionFactory.fromTransaction(session -> {
-				return orderRepository.findById(1,session);
+			Optional<Purchase> found = sessionFactory.fromTransaction(session -> {
+				return purchaseRepository.findById(1,session);
 			});
 			assertThat(found).isEmpty();
 		}
 	}
 	
-	private List<Order> readAllOrdersFromDatabase() {
+	private List<Purchase> readAllOrdersFromDatabase() {
 		return sessionFactory.fromTransaction(
-				session -> session.createSelectionQuery("from Order", Order.class).getResultList());
+				session -> session.createSelectionQuery("from Purchase", Purchase.class).getResultList());
 	}
 	
-	private void addOrderToDataBase(Order order) {
+	private void addOrderToDataBase(Purchase order) {
 		sessionFactory.inTransaction(session -> session.persist(order));
 	}
 }

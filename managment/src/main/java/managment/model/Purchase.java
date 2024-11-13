@@ -11,9 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-// Order is a keyword in SQL, so we need to use escape characters
-@Table(name = "`Order`")
-public class Order {
+@Table(name = "Purchase")
+public class Purchase {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,14 +23,14 @@ public class Order {
 	@Column(name = "amount", nullable = false)
 	private double amount;
 
-	public Order() {}
+	public Purchase() {}
 	
-	public Order(LocalDateTime orderDate, double amount) {
+	public Purchase(LocalDateTime orderDate, double amount) {
 		this.orderDate = orderDate;
 		this.amount = amount;
 	}
 	
-	public Order(int id, LocalDateTime orderDate, double amount) {
+	public Purchase(int id, LocalDateTime orderDate, double amount) {
 		this.id = id;
 		this.orderDate = orderDate;
 		this.amount = amount;
@@ -58,16 +57,16 @@ public class Order {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof Order))
+		if (!(obj instanceof Purchase))
 			return false;
-		Order other = (Order) obj;
+		Purchase other = (Purchase) obj;
 		return Double.doubleToLongBits(amount) == Double.doubleToLongBits(other.amount) && id == other.id
 				&& Objects.equals(orderDate, other.orderDate);
 	}
 
 	@Override
 	public String toString() {
-		return "Order [id=" + id + ", orderDate=" + orderDate + ", amount=" + amount + "]";
+		return "Purchase [id=" + id + ", orderDate=" + orderDate + ", amount=" + amount + "]";
 	}
 	
 	
