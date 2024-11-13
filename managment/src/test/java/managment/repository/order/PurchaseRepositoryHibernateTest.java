@@ -20,7 +20,7 @@ import managment.repository.purchase.PurchaseRepository;
 import managment.repository.purchase.PurchaseRepositoryHibernate;
 
 @DisplayName("Purchase Repository")
-class OrderRepositoryHibernateTest {
+class PurchaseRepositoryHibernateTest {
 	private static final String H2_DATABASE = "purchase-test-db";
 	private static final String CONNECTION_URL = String.format("jdbc:h2:mem:%s", H2_DATABASE);
 	private static final LocalDateTime FIRST_TEST_DATE = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
