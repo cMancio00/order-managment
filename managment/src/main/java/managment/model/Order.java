@@ -51,7 +51,7 @@ public class Order {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, orderDate);
+		return Objects.hash(amount, id, orderDate);
 	}
 
 	@Override
@@ -61,7 +61,8 @@ public class Order {
 		if (!(obj instanceof Order))
 			return false;
 		Order other = (Order) obj;
-		return id == other.id && Objects.equals(orderDate, other.orderDate);
+		return Double.doubleToLongBits(amount) == Double.doubleToLongBits(other.amount) && id == other.id
+				&& Objects.equals(orderDate, other.orderDate);
 	}
 
 	@Override
