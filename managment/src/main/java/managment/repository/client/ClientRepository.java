@@ -1,4 +1,4 @@
-package managment.repository;
+package managment.repository.client;
 
 import java.util.List;
 

@@ -8,9 +8,9 @@
 		<property name="hibernate.connection.driver_class">org.h2.Driver</property>
 		<!-- Echo all executed SQL to stdout -->
 		<property name="show_sql">true</property>
-		<!-- Automatically create/update tables -->
 		<property name="hbm2ddl.auto">create-drop</property> 
 		<!-- Names the annotated entity class -->
+		<mapping class="managment.model.Purchase" />
 		<mapping class="managment.model.Client" />
 	</session-factory>
 </hibernate-configuration>
