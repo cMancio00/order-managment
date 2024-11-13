@@ -1,4 +1,4 @@
-package managment.repository;
+package managment.repository.client;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import managment.model.Client;
+import managment.repository.client.ClientRepository;
+import managment.repository.client.ClientRepositoryHibernate;
 
 @DisplayName("Client Repository")
 class ClientRepositoryHibernateTest {
