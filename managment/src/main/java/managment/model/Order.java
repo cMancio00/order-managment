@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 
 @Entity
 // Order is a keyword in SQL, so we need to use escape characters
-@Table(name = "\"Order\"")
+@Table(name = "`Order`")
 public class Order {
 
 	@Id
