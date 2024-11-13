@@ -5,9 +5,11 @@ import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,6 +24,8 @@ public class Purchase {
 	private LocalDateTime orderDate;
 	@Column(name = "amount", nullable = false)
 	private double amount;
+	@ManyToOne(fetch = FetchType.LAZY)
+	Client client;
 
 	public Purchase() {}
 	
@@ -46,6 +50,14 @@ public class Purchase {
 
 	public double getAmount() {
 		return amount;
+	}
+
+	public Client getClient() {
+		return client;
+	}
+
+	public void setClient(Client client) {
+		this.client = client;
 	}
 
 	@Override
