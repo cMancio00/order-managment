@@ -18,4 +18,9 @@ public class OrderRepositoryHibernate implements OrderRepository{
 		return Optional.ofNullable(session.find(Order.class, id));
 	}
 
+	@Override
+	public void delete(Order toDelete, Session session) {
+		session.remove(toDelete);
+	}
+
 }

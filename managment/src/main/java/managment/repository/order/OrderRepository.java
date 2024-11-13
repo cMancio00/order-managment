@@ -12,4 +12,6 @@ public interface OrderRepository {
 
 	Optional<Order> findById(int id, Session session);
 
+	void delete(Order toDelete, Session session);
+
 }

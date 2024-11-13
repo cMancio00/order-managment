@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import managment.model.Client;
 import managment.model.Order;
 
 @DisplayName("Order Repository")
@@ -56,12 +57,26 @@ class OrderRepositoryHibernateTest {
 		void testFindByIdWhenIsPresent(){
 			Order notToBeFound = new Order(FIRST_TEST_DATE, 10.0);
 			Order toBeFound = new Order(SECOND_TEST_DATE, 5.0);
+			addOrderToDataBase(notToBeFound);
+			addOrderToDataBase(toBeFound);
 			Optional<Order> found = sessionFactory.fromTransaction(session -> {
-				addOrderToDataBase(notToBeFound, session);
-				addOrderToDataBase(toBeFound, session);
 				return orderRepository.findById(2, session);
 			});
 			assertThat(found).contains(new Order(2, SECOND_TEST_DATE, 5.0));
+		}
+		
+		@DisplayName("Delete Order when is present")
+		@Test
+		void testDeleteWhenClientIsPresent(){
+			Order notToDeleted = new Order(FIRST_TEST_DATE, 10.0);
+			Order toBeDeleted = new Order(SECOND_TEST_DATE, 5.0);
+			addOrderToDataBase(notToDeleted);
+			addOrderToDataBase(toBeDeleted);
+			sessionFactory.inTransaction(session -> {
+				Order toDelete = session.find(Order.class, 2);
+				orderRepository.delete(toDelete, session);
+			});
+			assertThat(readAllOrdersFromDatabase()).containsExactly(new Order(1, FIRST_TEST_DATE, 10.0));
 		}
 	}
 	
@@ -83,7 +98,7 @@ class OrderRepositoryHibernateTest {
 				session -> session.createSelectionQuery("from Order", Order.class).getResultList());
 	}
 	
-	private void addOrderToDataBase(Order order, Session session) {
-		session.persist(order);
+	private void addOrderToDataBase(Order order) {
+		sessionFactory.inTransaction(session -> session.persist(order));
 	}
 }
