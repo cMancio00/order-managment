@@ -16,7 +16,7 @@ import managment.model.Client;
 
 @DisplayName("Client Repository")
 class ClientRepositoryHibernateTest {
-	private static final String H2_DATABASE = "test-db";
+	private static final String H2_DATABASE = "client-test-db";
 	private static final String CONNECTION_URL = String.format("jdbc:h2:mem:%s", H2_DATABASE);
 	private SessionFactory sessionFactory;
 	private ClientRepository clientRepository;

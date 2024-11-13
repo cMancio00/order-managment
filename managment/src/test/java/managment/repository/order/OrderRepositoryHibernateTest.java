@@ -19,7 +19,7 @@ import managment.model.Order;
 
 @DisplayName("Order Repository")
 class OrderRepositoryHibernateTest {
-	private static final String H2_DATABASE = "test-db";
+	private static final String H2_DATABASE = "order-test-db";
 	private static final String CONNECTION_URL = String.format("jdbc:h2:mem:%s", H2_DATABASE);
 	private static final LocalDateTime FIRST_TEST_DATE = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 	private static final LocalDateTime SECOND_TEST_DATE = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
