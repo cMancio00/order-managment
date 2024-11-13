@@ -1,5 +1,6 @@
 package managment.repository.order;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.Session;
@@ -13,5 +14,7 @@ public interface OrderRepository {
 	Optional<Order> findById(int id, Session session);
 
 	void delete(Order toDelete, Session session);
+
+	List<Order> findAll(Session session);
 
 }

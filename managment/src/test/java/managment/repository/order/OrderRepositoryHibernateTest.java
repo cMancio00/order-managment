@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.AfterEach;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import managment.model.Client;
 import managment.model.Order;
 
 @DisplayName("Order Repository")
@@ -77,6 +75,27 @@ class OrderRepositoryHibernateTest {
 				orderRepository.delete(toDelete, session);
 			});
 			assertThat(readAllOrdersFromDatabase()).containsExactly(new Order(1, FIRST_TEST_DATE, 10.0));
+		}
+		
+		@DisplayName("Find all when database is empty should return an empty list")
+		@Test
+		void testFindAllWhenDatabaseIsEmpty(){
+			List<Order> clients = sessionFactory.fromSession(session ->
+				 orderRepository.findAll(session));
+			assertThat(clients).isEmpty();
+		}
+		@DisplayName("Find all when orders are present should return the list of orders")
+		@Test
+		void testFindAllWhenClientsArePresent(){
+			Order firstOrder = new Order(FIRST_TEST_DATE, 10.0);
+			Order secondOrder = new Order(SECOND_TEST_DATE, 5.0);
+			addOrderToDataBase(firstOrder);
+			addOrderToDataBase(secondOrder);
+			List<Order> orders = sessionFactory.fromSession(session -> orderRepository.findAll(session));
+			assertThat(orders).containsExactly(
+					new Order(1, FIRST_TEST_DATE, 10.0),
+					new Order(2, SECOND_TEST_DATE, 5.0)
+				);
 		}
 	}
 	

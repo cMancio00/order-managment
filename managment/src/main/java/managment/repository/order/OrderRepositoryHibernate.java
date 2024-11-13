@@ -1,5 +1,6 @@
 package managment.repository.order;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.Session;
@@ -21,6 +22,11 @@ public class OrderRepositoryHibernate implements OrderRepository{
 	@Override
 	public void delete(Order toDelete, Session session) {
 		session.remove(toDelete);
+	}
+
+	@Override
+	public List<Order> findAll(Session session) {
+		return session.createSelectionQuery("from Order", Order.class).getResultList();
 	}
 
 }
