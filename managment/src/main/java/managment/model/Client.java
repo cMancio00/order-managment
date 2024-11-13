@@ -1,5 +1,6 @@
 package managment.model;
 
+import java.util.List;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -7,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -18,6 +20,8 @@ public class Client {
 	private int id;
 	@Column(name = "name", nullable = false)
 	private String name;
+	@OneToMany(mappedBy = "client")
+	List<Purchase> purchases;
 	
 	// Empty constructor for hibernate
 	public Client() {}
@@ -33,6 +37,14 @@ public class Client {
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<Purchase> getPurchases() {
+		return purchases;
+	}
+
+	public void setPurchases(List<Purchase> purchases) {
+		this.purchases = purchases;
 	}
 
 	@Override
