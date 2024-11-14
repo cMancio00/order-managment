@@ -1,5 +1,7 @@
 package managment.service;
 
+import java.util.List;
+
 import org.hibernate.SessionFactory;
 
 import managment.model.Client;
@@ -51,6 +53,10 @@ public class PurchaseManagmentService {
 			clientRepository.delete(client, session);
 		});
 		
+	}
+
+	public List<Client> findAllClients() {
+		return sessionFactory.fromTransaction(session -> clientRepository.findAll(session));
 	}
 
 }

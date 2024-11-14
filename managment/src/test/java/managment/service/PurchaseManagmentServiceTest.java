@@ -1,7 +1,6 @@
 package managment.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -11,13 +10,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static java.util.Arrays.asList;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +32,9 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
 import managment.model.Client;
 import managment.model.Purchase;
 import managment.repository.client.ClientRepository;
@@ -36,6 +42,7 @@ import managment.repository.purchase.PurchaseRepository;
 
 @DisplayName("Purchase Managment Service")
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class PurchaseManagmentServiceTest {
 
 	private static final LocalDateTime FIRST_TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
@@ -62,6 +69,11 @@ class PurchaseManagmentServiceTest {
 			code.accept(session);
 			return null;
 		}).when(sessionFactory).inTransaction(any());
+		
+		when(sessionFactory.fromTransaction(any())).thenAnswer(invocation -> {
+			Function<Session,?> code = invocation.getArgument(0);
+			return code.apply(session);
+		});
 	}
 
 	@Nested
@@ -129,6 +141,24 @@ class PurchaseManagmentServiceTest {
 			verify(sessionFactory, times(1)).inTransaction(any());
 			verifyNoMoreInteractions(clientRepository);
 			verifyNoMoreInteractions(purchaseRepository);
+		}
+		
+		@Test
+		@DisplayName("Find all Clients should return a list of all clients")
+		void findAllClients() {			
+			Client firstClient = new Client(1,"firstClient");
+			Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
+			purchase.setClient(firstClient);
+			Client secondClient = new Client(2,"secondClient");
+			when(clientRepository.findAll(any())).thenReturn(
+					asList(
+							firstClient,
+							secondClient));
+			List<Client> clients = service.findAllClients();
+			verify(clientRepository).findAll(session);
+			verify(sessionFactory, times(1)).fromTransaction(any());
+			verifyNoInteractions(purchaseRepository);
+			assertThat(clients).containsExactly(firstClient,secondClient);
 		}
 	}
 
