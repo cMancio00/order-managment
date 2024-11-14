@@ -7,6 +7,9 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -63,9 +66,9 @@ class PurchaseManagmentServiceTest {
 	class CrudMethods {
 		@Test
 		@DisplayName("Add Purchase should respect relational constraints")
-		void addPurchaseShouldRespectRelationalConstraints() {
-			Client client = new Client(1, "testClient");
-			Purchase purchase = new Purchase(1, FIRST_TEST_DATE, 10.0);
+		void testAddPurchaseShouldRespectRelationalConstraints() {
+			Client client = new Client("testClient");
+			Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
 			client.setPurchases(new ArrayList<Purchase>());
 			service.addPurchaseToClient(client, purchase);
 			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
@@ -74,6 +77,17 @@ class PurchaseManagmentServiceTest {
 			verify(sessionFactory, times(1)).inTransaction(any());
 			assertThat(client.getPurchases()).containsExactly(purchase);
 			assertThat(purchase.getClient()).isEqualTo(client);
+		}
+		
+		@Test
+		@DisplayName("Add Client")
+		void testAddClient(){
+			Client client = new Client("testClient");
+			service.addClient(client);
+			verify(clientRepository).save(client, session);
+			verify(sessionFactory, times(1)).inTransaction(any());
+			verifyNoMoreInteractions(clientRepository);
+			verifyNoInteractions(purchaseRepository);
 		}
 	}
 

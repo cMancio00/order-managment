@@ -28,4 +28,9 @@ public class PurchaseManagmentService {
 		});
 	}
 
+	public void addClient(Client client) {
+		sessionFactory.inTransaction(session -> clientRepository.save(client, session));
+		
+	}
+
 }
