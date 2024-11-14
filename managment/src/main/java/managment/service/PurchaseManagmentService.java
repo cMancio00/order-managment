@@ -43,4 +43,14 @@ public class PurchaseManagmentService {
 		
 	}
 
+	public void deleteClient(Client client) {
+		sessionFactory.inTransaction(session -> {
+			for (Purchase purchase : client.getPurchases()) {
+				purchaseRepository.delete(purchase, session);
+			}
+			clientRepository.delete(client, session);
+		});
+		
+	}
+
 }

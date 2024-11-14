@@ -1,6 +1,7 @@
 package managment.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -109,6 +110,25 @@ class PurchaseManagmentServiceTest {
 			inOrder.verify(clientRepository).save(eq(client), any());
 			verify(sessionFactory, times(1)).inTransaction(any());
 			assertThat(client.getPurchases()).containsExactly(purchase);
+		}
+		
+		@Test
+		@DisplayName("Delete Client should also delete all its purchases")
+		void testDeleteClient(){
+			Client client = new Client(1,"testClient");
+			Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
+			purchase.setClient(client);
+			Purchase toDelete = new Purchase(2,SECOND_TEST_DATE, 5.0);
+			toDelete.setClient(client);
+			client.setPurchases(new ArrayList<Purchase>(Arrays.asList(purchase,toDelete)));
+			
+			service.deleteClient(client);
+			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
+			inOrder.verify(purchaseRepository, times(2)).delete(any(Purchase.class), any());
+			inOrder.verify(clientRepository).delete(eq(client), any());
+			verify(sessionFactory, times(1)).inTransaction(any());
+			verifyNoMoreInteractions(clientRepository);
+			verifyNoMoreInteractions(purchaseRepository);
 		}
 	}
 
