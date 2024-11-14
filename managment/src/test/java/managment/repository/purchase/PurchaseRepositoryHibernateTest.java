@@ -1,4 +1,4 @@
-package managment.repository.order;
+package managment.repository.purchase;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -16,8 +16,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import managment.model.Purchase;
-import managment.repository.purchase.PurchaseRepository;
-import managment.repository.purchase.PurchaseRepositoryHibernate;
 
 @DisplayName("Purchase Repository")
 class PurchaseRepositoryHibernateTest {
