@@ -145,7 +145,7 @@ class PurchaseManagmentServiceTest {
 		
 		@Test
 		@DisplayName("Find all Clients should return a list of all clients")
-		void findAllClients() {			
+		void findAllClients() {
 			Client firstClient = new Client(1,"firstClient");
 			Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
 			purchase.setClient(firstClient);
@@ -159,6 +159,20 @@ class PurchaseManagmentServiceTest {
 			verify(sessionFactory, times(1)).fromTransaction(any());
 			verifyNoInteractions(purchaseRepository);
 			assertThat(clients).containsExactly(firstClient,secondClient);
+		}
+		
+		@Test
+		@DisplayName("Find all purchases of a given client should return a list of its purchases")
+		void findAllPurchaseOfClient() {
+			Client client = new Client(1,"testClient");
+			Purchase firstPurchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
+			firstPurchase.setClient(client);
+			Purchase secondPurchase = new Purchase(2,SECOND_TEST_DATE, 5.0);
+			secondPurchase.setClient(client);
+			client.setPurchases(new ArrayList<Purchase>(Arrays.asList(firstPurchase,secondPurchase)));
+			List<Purchase> purchases = service.findallPurchases(client);
+			verify(sessionFactory, times(1)).fromTransaction(any());
+			assertThat(purchases).containsExactly(firstPurchase,secondPurchase);
 		}
 	}
 

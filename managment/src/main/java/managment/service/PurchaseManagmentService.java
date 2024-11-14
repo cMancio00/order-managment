@@ -59,4 +59,8 @@ public class PurchaseManagmentService {
 		return sessionFactory.fromTransaction(session -> clientRepository.findAll(session));
 	}
 
+	public List<Purchase> findallPurchases(Client client) {
+		return sessionFactory.fromTransaction(session -> client.getPurchases());
+	}
+
 }
