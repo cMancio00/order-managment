@@ -35,6 +35,10 @@ public class Client {
 		this.name = name;
 	}
 	
+	public int getId() {
+		return id;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}

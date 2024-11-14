@@ -9,11 +9,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.Consumer;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -36,7 +38,7 @@ import managment.repository.purchase.PurchaseRepository;
 class PurchaseManagmentServiceTest {
 
 	private static final LocalDateTime FIRST_TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
-
+	private static final LocalDateTime SECOND_TEST_DATE = LocalDate.of(2024, Month.FEBRUARY, 1).atStartOfDay();
 	@Mock
 	private SessionFactory sessionFactory;
 
@@ -88,6 +90,25 @@ class PurchaseManagmentServiceTest {
 			verify(sessionFactory, times(1)).inTransaction(any());
 			verifyNoMoreInteractions(clientRepository);
 			verifyNoInteractions(purchaseRepository);
+		}
+		
+		@Test
+		@DisplayName("Delete Purchase")
+		void testDeletePurchase(){
+			Client client = new Client(1,"testClient");
+			Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
+			purchase.setClient(client);
+			Purchase toDelete = new Purchase(2,SECOND_TEST_DATE, 5.0);
+			toDelete.setClient(client);
+			client.setPurchases(new ArrayList<Purchase>(Arrays.asList(purchase,toDelete)));
+			
+			when(clientRepository.findById(eq(1), any())).thenReturn(client);
+			service.deletePurchase(toDelete);
+			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
+			inOrder.verify(purchaseRepository).delete(eq(toDelete), any());
+			inOrder.verify(clientRepository).save(eq(client), any());
+			verify(sessionFactory, times(1)).inTransaction(any());
+			assertThat(client.getPurchases()).containsExactly(purchase);
 		}
 	}
 
