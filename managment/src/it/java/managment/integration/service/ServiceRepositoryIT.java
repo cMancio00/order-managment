@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
@@ -175,6 +174,21 @@ class ServiceRepositoryIT {
 				new Purchase(2, SECOND_TEST_DATE, 5.0)
 				);
 		
+	}
+	
+	@Test
+	@DisplayName("Find all clients should return a list of clients")
+	void testFindAllClients() {
+		Client client = new Client("client");
+		Client otherClient = new Client("otherClient");
+		addTestClientToDatabase(client);
+		addTestClientToDatabase(otherClient);
+		
+		List<Client> clients = service.findAllClients();
+		assertThat(clients).containsExactly(
+				new Client(1, "client"),
+				new Client(2, "otherClient")
+				);
 	}
 	
 	
