@@ -1,12 +1,10 @@
 package managment.integration.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.assertj.core.api.Assertions.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 import java.util.Properties;
 
@@ -22,6 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import managment.model.Client;
+import managment.model.Purchase;
 import managment.repository.client.ClientRepository;
 import managment.repository.client.ClientRepositoryHibernate;
 import managment.repository.purchase.PurchaseRepository;
@@ -31,10 +30,11 @@ import managment.service.PurchaseManagmentService;
 import org.junit.jupiter.api.Test;
 
 @Testcontainers
+@DisplayName("Service-Repository IntegrationTest")
 class ServiceRepositoryIT {
 	
 	private static String mysqlVersion = System.getProperty("mysql.version", "9.1.0");
-	
+	private static final LocalDateTime FIRST_TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
 	@Container
 	@SuppressWarnings({ "rawtypes", "resource" })
 	public static final MySQLContainer mysql = new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
@@ -79,8 +79,8 @@ class ServiceRepositoryIT {
 	@Test
 	@DisplayName("Add Client should add a client to the database")
 	void testAddClient() {
-		Client client = new Client("existingClient");
-		addTestClientToDatabase(client);
+		Client existingClient = new Client("existingClient");
+		addTestClientToDatabase(existingClient);
 		Client toAdd = new Client("toAdd");
 		service.addClient(toAdd);
 		assertThat(readAllClientFromDatabase()).containsExactly(
@@ -88,6 +88,19 @@ class ServiceRepositoryIT {
 				new Client(2,"toAdd")
 				);
 		
+	}
+	
+	@Test
+	@DisplayName("Add Purchase to Client should add a purchase to client")
+	void addPurchaseToClient(){
+		Client clientNotToAddPurchase = new Client("clientNotToAddPurchase");
+		addTestClientToDatabase(clientNotToAddPurchase);
+		Client clientToAddPurchase = new Client("clientToAddPurchase");
+		addTestClientToDatabase(clientToAddPurchase);
+		Purchase purchaseToAdd = new Purchase(FIRST_TEST_DATE,10.0);
+		
+		service.addPurchaseToClient(clientToAddPurchase, purchaseToAdd);
+		assertThat(findPurchasesOfClient(2)).containsExactly(new Purchase(1, FIRST_TEST_DATE,10.0));
 	}
 	
 	private List<Client> readAllClientFromDatabase() {
@@ -99,5 +112,12 @@ class ServiceRepositoryIT {
 		sessionFactory.inTransaction(session ->
 			session.persist(client));
 	}
+	
+	private List<Purchase> findPurchasesOfClient(int clientId){
+		return sessionFactory.fromTransaction(session ->
+			session.find(Client.class, clientId).getPurchases());
+	}
+	
+	
 
 }

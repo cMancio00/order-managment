@@ -3,6 +3,9 @@ package managment.model;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,7 +25,8 @@ public class Client {
 	@Column(name = "name", nullable = false)
 	private String name;
 	@OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
-	List<Purchase> purchases;
+	@Fetch(FetchMode.JOIN)
+	private List<Purchase> purchases;
 	
 	// Empty constructor for hibernate
 	public Client() {}

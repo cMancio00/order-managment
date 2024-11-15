@@ -1,5 +1,6 @@
 package managment.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -23,6 +24,8 @@ public class PurchaseManagmentService {
 
 	public void addPurchaseToClient(Client client, Purchase purchase) {
 		purchase.setClient(client);
+		if(client.getPurchases() == null)
+			client.setPurchases(new ArrayList<>());
 		client.getPurchases().add(purchase);
 		sessionFactory.inTransaction(session -> {
 			purchaseRepository.save(purchase, session);

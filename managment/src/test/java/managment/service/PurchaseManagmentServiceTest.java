@@ -95,6 +95,20 @@ class PurchaseManagmentServiceTest {
 		}
 		
 		@Test
+		@DisplayName("Add Purchase on new Client should aslo create the list of purchases")
+		void testAddPurchaseOnNewClient() {
+			Client client = new Client("testClient");
+			Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
+			service.addPurchaseToClient(client, purchase);
+			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
+			inOrder.verify(purchaseRepository).save(eq(purchase), any());
+			inOrder.verify(clientRepository).save(eq(client), any());
+			verify(sessionFactory, times(1)).inTransaction(any());
+			assertThat(client.getPurchases()).containsExactly(purchase);
+			assertThat(purchase.getClient()).isEqualTo(client);
+		}
+		
+		@Test
 		@DisplayName("Add Client")
 		void testAddClient(){
 			Client client = new Client("testClient");
