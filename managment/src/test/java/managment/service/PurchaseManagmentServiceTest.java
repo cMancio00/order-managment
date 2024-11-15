@@ -83,8 +83,24 @@ class PurchaseManagmentServiceTest {
 		@DisplayName("Add Purchase should respect relational constraints")
 		void testAddPurchaseShouldRespectRelationalConstraints() {
 			Client client = new Client("testClient");
+			Purchase existingPurchase = new Purchase(FIRST_TEST_DATE, 10.0);
+			Purchase purchase = new Purchase(SECOND_TEST_DATE, 5.0);
+			client.setPurchases(new ArrayList<Purchase>(asList(existingPurchase)));
+			
+			service.addPurchaseToClient(client, purchase);
+			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
+			inOrder.verify(purchaseRepository).save(eq(purchase), any());
+			inOrder.verify(clientRepository).save(eq(client), any());
+			verify(sessionFactory, times(1)).inTransaction(any());
+			assertThat(client.getPurchases()).containsExactly(existingPurchase,purchase);
+			assertThat(purchase.getClient()).isEqualTo(client);
+		}
+		
+		@Test
+		@DisplayName("Add Purchase on new Client should aslo create the list of purchases")
+		void testAddPurchaseOnNewClient() {
+			Client client = new Client("testClient");
 			Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
-			client.setPurchases(new ArrayList<Purchase>());
 			service.addPurchaseToClient(client, purchase);
 			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
 			inOrder.verify(purchaseRepository).save(eq(purchase), any());
