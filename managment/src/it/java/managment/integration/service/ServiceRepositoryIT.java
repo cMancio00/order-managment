@@ -1,13 +1,13 @@
 package managment.integration.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
@@ -127,6 +127,27 @@ class ServiceRepositoryIT {
 		assertThat(client.getPurchases()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
 	}
 
+	
+	@Test
+	@DisplayName("Delete client should remove all his purchases")
+	void testDeleteClient() {
+		Client clientToremove = new Client("clientToAddPurchase");
+		clientToremove.setPurchases(new ArrayList<Purchase>());
+		addTestClientToDatabase(clientToremove);
+		Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
+		purchase.setClient(clientToremove);
+		sessionFactory.inTransaction(session -> {
+			Client client = session.find(Client.class, clientToremove.getId());
+			session.persist(purchase);
+			client.getPurchases().add(purchase);
+			session.merge(client);
+		});
+		Client toRemove = sessionFactory.fromTransaction(session -> session.find(Client.class, 1));
+		service.deleteClient(toRemove);
+		Purchase foundPurchase = sessionFactory.fromTransaction(session -> session.find(Purchase.class, 1));
+		assertThat(foundPurchase).isNull();
+	}
+	
 	private List<Client> readAllClientFromDatabase() {
 		return sessionFactory
 				.fromTransaction(session -> session.createSelectionQuery("from Client", Client.class).getResultList());
