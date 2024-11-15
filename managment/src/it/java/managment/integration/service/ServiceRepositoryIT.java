@@ -148,6 +148,36 @@ class ServiceRepositoryIT {
 		assertThat(foundPurchase).isNull();
 	}
 	
+	
+	@Test
+	@DisplayName("Find all purchase should return a list of client's purchase")
+	void testFindAllPurchaseOfClient() {
+		Client client = new Client("clientToAddPurchase");
+		client.setPurchases(new ArrayList<Purchase>());
+		addTestClientToDatabase(client);
+		Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
+		purchase.setClient(client);
+		Purchase otherPurchase = new Purchase(SECOND_TEST_DATE, 5.0);
+		otherPurchase.setClient(client);
+		sessionFactory.inTransaction(session -> {
+			Client c = session.find(Client.class, client.getId());
+			session.persist(purchase);
+			session.persist(otherPurchase);
+			c.getPurchases().add(purchase);
+			c.getPurchases().add(purchase);
+			session.merge(client);
+		});
+		
+		Client toFound = sessionFactory.fromTransaction(session -> session.find(Client.class, 1));
+		List<Purchase> purchases = service.findallPurchases(toFound);
+		assertThat(purchases).containsExactly(
+				new Purchase(1, FIRST_TEST_DATE, 10.0),
+				new Purchase(2, SECOND_TEST_DATE, 5.0)
+				);
+		
+	}
+	
+	
 	private List<Client> readAllClientFromDatabase() {
 		return sessionFactory
 				.fromTransaction(session -> session.createSelectionQuery("from Client", Client.class).getResultList());
