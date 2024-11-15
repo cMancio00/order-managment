@@ -1,10 +1,12 @@
 package managment.integration.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,16 +34,16 @@ import org.junit.jupiter.api.Test;
 @Testcontainers
 @DisplayName("Service-Repository IntegrationTest")
 class ServiceRepositoryIT {
-	
+
 	private static String mysqlVersion = System.getProperty("mysql.version", "9.1.0");
 	private static final LocalDateTime FIRST_TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
+	private static final LocalDateTime SECOND_TEST_DATE = LocalDate.of(2024, Month.FEBRUARY, 1).atStartOfDay();
+	
 	@Container
 	@SuppressWarnings({ "rawtypes", "resource" })
 	public static final MySQLContainer mysql = new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
-			.withDatabaseName("it-db")
-			.withUsername("manager")
-			.withPassword("it");
-	
+			.withDatabaseName("it-db").withUsername("manager").withPassword("it");
+
 	private static SessionFactory sessionFactory;
 
 	private ClientRepository clientRepository;
@@ -49,8 +51,7 @@ class ServiceRepositoryIT {
 	private PurchaseRepository purchaseRepository;
 
 	private PurchaseManagmentService service;
-	
-	
+
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		Properties mysqlProperties = new Properties();
@@ -60,9 +61,10 @@ class ServiceRepositoryIT {
 		System.setProperty("hibernate.connection.url", mysql.getJdbcUrl());
 		System.setProperty("hibernate.connection.username", mysql.getUsername());
 		System.setProperty("hibernate.connection.password", mysql.getPassword());
-		sessionFactory = new Configuration().setProperties(mysqlProperties).configure("hibernate-integration.cfg.xml").buildSessionFactory();
+		sessionFactory = new Configuration().setProperties(mysqlProperties).configure("hibernate-integration.cfg.xml")
+				.buildSessionFactory();
 	}
-	
+
 	@BeforeEach
 	void setup() {
 		sessionFactory.getCache().evictAllRegions();
@@ -70,7 +72,7 @@ class ServiceRepositoryIT {
 		purchaseRepository = new PurchaseRepositoryHibernate();
 		service = new PurchaseManagmentService(sessionFactory, clientRepository, purchaseRepository);
 	}
-	
+
 	@AfterEach
 	void tearDown() {
 		sessionFactory.getSchemaManager().truncateMappedObjects();
@@ -83,41 +85,59 @@ class ServiceRepositoryIT {
 		addTestClientToDatabase(existingClient);
 		Client toAdd = new Client("toAdd");
 		service.addClient(toAdd);
-		assertThat(readAllClientFromDatabase()).containsExactly(
-				new Client(1,"existingClient"),
-				new Client(2,"toAdd")
-				);
-		
+		assertThat(readAllClientFromDatabase()).containsExactly(new Client(1, "existingClient"),
+				new Client(2, "toAdd"));
+
 	}
-	
+
 	@Test
 	@DisplayName("Add Purchase to Client should add a purchase to client")
-	void addPurchaseToClient(){
+	void addPurchaseToClient() {
 		Client clientNotToAddPurchase = new Client("clientNotToAddPurchase");
 		addTestClientToDatabase(clientNotToAddPurchase);
 		Client clientToAddPurchase = new Client("clientToAddPurchase");
 		addTestClientToDatabase(clientToAddPurchase);
-		Purchase purchaseToAdd = new Purchase(FIRST_TEST_DATE,10.0);
-		
+		Purchase purchaseToAdd = new Purchase(FIRST_TEST_DATE, 10.0);
+
 		service.addPurchaseToClient(clientToAddPurchase, purchaseToAdd);
-		assertThat(findPurchasesOfClient(2)).containsExactly(new Purchase(1, FIRST_TEST_DATE,10.0));
+		assertThat(findPurchasesOfClient(2)).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
 	}
-	
+
+	@Test
+	@DisplayName("Delete purchase should remove the purchase from client list")
+	void testDeletePurchase() {
+		Client clientToAddPurchase = new Client("clientToAddPurchase");
+		clientToAddPurchase.setPurchases(new ArrayList<Purchase>());
+		addTestClientToDatabase(clientToAddPurchase);
+		Purchase purchaseToRemain = new Purchase(FIRST_TEST_DATE, 10.0);
+		purchaseToRemain.setClient(clientToAddPurchase);
+		Purchase purchaseToRemove = new Purchase(SECOND_TEST_DATE, 5.0);
+		purchaseToRemove.setClient(clientToAddPurchase);
+		sessionFactory.inTransaction(session -> {
+			Client client = session.find(Client.class, clientToAddPurchase.getId());
+			session.persist(purchaseToRemain);
+			session.persist(purchaseToRemove);
+			client.getPurchases().add(purchaseToRemain);
+			client.getPurchases().add(purchaseToRemove);
+			session.merge(client);
+		});
+		Purchase toRemove = sessionFactory.fromTransaction(session -> session.find(Purchase.class, 2));
+		service.deletePurchase(toRemove);
+		Client client = sessionFactory.fromTransaction(session -> session.find(Client.class, 1));
+		assertThat(client.getPurchases()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
+	}
+
 	private List<Client> readAllClientFromDatabase() {
 		return sessionFactory
 				.fromTransaction(session -> session.createSelectionQuery("from Client", Client.class).getResultList());
 	}
-	
+
 	private void addTestClientToDatabase(Client client) {
-		sessionFactory.inTransaction(session ->
-			session.persist(client));
+		sessionFactory.inTransaction(session -> session.persist(client));
 	}
-	
-	private List<Purchase> findPurchasesOfClient(int clientId){
-		return sessionFactory.fromTransaction(session ->
-			session.find(Client.class, clientId).getPurchases());
+
+	private List<Purchase> findPurchasesOfClient(int clientId) {
+		return sessionFactory.fromTransaction(session -> session.find(Client.class, clientId).getPurchases());
 	}
-	
-	
 
 }
