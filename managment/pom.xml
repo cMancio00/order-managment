@@ -211,7 +211,7 @@
 						<targetTests>
 							<!-- Test to use -->
 							<param>**.repository.*</param>
-							<param>**.service.*</param>
+							<param>managment.service.*</param>
 						</targetTests>
 						<mutators>
 							<mutator>STRONGER</mutator>
