@@ -18,6 +18,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -131,7 +132,7 @@ class PurchaseManagmentServiceTest {
 			toDelete.setClient(client);
 			client.setPurchases(new ArrayList<Purchase>(Arrays.asList(purchase,toDelete)));
 			
-			when(clientRepository.findById(eq(1), any())).thenReturn(client);
+			when(clientRepository.findById(eq(1), any())).thenReturn(Optional.of(client));
 			service.deletePurchase(toDelete);
 			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
 			inOrder.verify(purchaseRepository).delete(eq(toDelete), any());
@@ -189,6 +190,40 @@ class PurchaseManagmentServiceTest {
 			List<Purchase> purchases = service.findallPurchases(client);
 			verify(sessionFactory, times(1)).fromTransaction(any());
 			assertThat(purchases).containsExactly(firstPurchase,secondPurchase);
+		}
+		
+		@Test
+		@DisplayName("Find purchase by id when purchase is present")
+		void testFindPurchaseByIdWhenExists(){
+			Purchase purchase = new Purchase(1, FIRST_TEST_DATE,10.0);
+			when(purchaseRepository.findById(1, session)).thenReturn(Optional.of(purchase));
+			Optional<Purchase> foundPurchase = service.findPurchaseById(1);
+			assertThat(foundPurchase).contains(purchase);
+		}
+		
+		@Test
+		@DisplayName("Find purchase by id when purchase is not present")
+		void testFindPurchaseByIdWhenDoesNotExists(){
+			when(purchaseRepository.findById(1, session)).thenReturn(Optional.empty());
+			Optional<Purchase> foundPurchase = service.findPurchaseById(1);
+			assertThat(foundPurchase).isEmpty();
+		}
+		
+		@Test
+		@DisplayName("Find client by id when client is present")
+		void testFindClientByIdWhenExists(){
+			Client existingClient = new Client(1,"existingClient");
+			when(clientRepository.findById(1, session)).thenReturn(Optional.of(existingClient));
+			Optional<Client> foundClient = service.findClientById(1);
+			assertThat(foundClient).contains(existingClient);
+		}
+		
+		@Test
+		@DisplayName("Find client by id when purchase is not present")
+		void testFindClientByIdWhenDoesNotExists(){
+			when(purchaseRepository.findById(1, session)).thenReturn(Optional.empty());
+			Optional<Client> foundClient = service.findClientById(1);
+			assertThat(foundClient).isEmpty();
 		}
 	}
 

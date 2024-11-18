@@ -19,4 +19,8 @@ public interface ManagmentView {
 
 	void purchaseAdded(Purchase toAdd);
 
+	void purchaseRemoved(Purchase toDelete);
+
+	void showPurchaseNotFoundError(String string, Purchase toDelete);
+
 }

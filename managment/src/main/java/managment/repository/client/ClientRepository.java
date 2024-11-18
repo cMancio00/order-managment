@@ -1,6 +1,7 @@
 package managment.repository.client;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.Session;
 
@@ -10,7 +11,7 @@ public interface ClientRepository {
 
 	void save(Client client, Session session);
 
-	Client findById(int id, Session session);
+	Optional<Client> findById(int id, Session session);
 
 	void delete(Client toDelete, Session session);
 

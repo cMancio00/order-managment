@@ -3,7 +3,6 @@ package managment.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.hibernate.SessionFactory;
 
 import managment.model.Client;
@@ -41,10 +40,12 @@ public class PurchaseManagmentService {
 
 	public void deletePurchase(Purchase toDelete) {
 		sessionFactory.inTransaction(session -> {
-			Client client = clientRepository.findById(toDelete.getClient().getId(), session);
-			client.getPurchases().remove(toDelete);
-			purchaseRepository.delete(toDelete, session);
-			clientRepository.save(client, session);
+			Optional<Client> foundClient = clientRepository.findById(toDelete.getClient().getId(), session);
+			foundClient.ifPresent(client ->{
+				client.getPurchases().remove(toDelete);
+				purchaseRepository.delete(toDelete, session);
+				clientRepository.save(client, session);
+			});
 		});
 		
 	}
@@ -66,10 +67,13 @@ public class PurchaseManagmentService {
 	public List<Purchase> findallPurchases(Client client) {
 		return sessionFactory.fromTransaction(session -> client.getPurchases());
 	}
-
+	
 	public Optional<Client> findClientById(int id) {
-		return null;
-		
+		return sessionFactory.fromTransaction(session -> clientRepository.findById(id, session));
+	}
+	
+	public Optional<Purchase> findPurchaseById(int id) {
+		return sessionFactory.fromTransaction(session -> purchaseRepository.findById(id, session));
 	}
 
 }
