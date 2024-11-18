@@ -72,4 +72,8 @@ public class PurchaseManagmentService {
 		
 	}
 
+	public Optional<Purchase> findPurchaseById(int id) {
+		return null;
+	}
+
 }

@@ -63,4 +63,13 @@ public class Managmentcontroller {
 		view.showClientNotFoundError(client.toString() + " not found", client);
 	}
 
+	public void remove(Purchase toDelete) {
+		Optional<Purchase> foundPurchase = service.findPurchaseById(1);
+		foundPurchase.ifPresentOrElse(purchase -> {
+			service.deletePurchase(toDelete);
+			view.purchaseRemoved(toDelete);
+		},
+				() -> view.showPurchaseNotFoundError(toDelete.toString() + " not found", toDelete));
+	}
+
 }
