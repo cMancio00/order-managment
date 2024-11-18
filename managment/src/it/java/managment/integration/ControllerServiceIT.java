@@ -146,7 +146,25 @@ class ControllerServiceIT {
 		verify(view).purchaseAdded(toAdd);
 	}
 	
-	
+	@Test
+	@DisplayName("Remove purchase when exists")
+	void testRemovePurchaseWhenExists(){
+		Client selectedClient = new Client("selectedClient");
+		selectedClient.setPurchases(new ArrayList<Purchase>());
+		addClientToDatabase(selectedClient);
+		Purchase existingPurchase = new Purchase(TEST_DATE, 10.0);
+		existingPurchase.setClient(selectedClient);
+
+		sessionFactory.inTransaction(session -> {
+			Client client = session.find(Client.class, selectedClient.getId());
+			session.persist(existingPurchase);
+			client.getPurchases().add(existingPurchase);
+			session.merge(client);
+		});
+		
+		controller.remove(existingPurchase);
+		verify(view).purchaseRemoved(existingPurchase);
+	}
 	
 	private void addClientToDatabase(Client client) {
 		sessionFactory.inTransaction(session ->
