@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
@@ -191,6 +192,40 @@ class ServiceRepositoryIT {
 				);
 	}
 	
+	@Test
+	@DisplayName("Find client by id")
+	void testFindClientById(){
+		Client notToBeFound = new Client("notToBeFound");
+		Client toBeFound = new Client("toBeFound");
+		addTestClientToDatabase(notToBeFound);
+		addTestClientToDatabase(toBeFound);
+		
+		Optional<Client> foundClient = service.findClientById(2);
+		assertThat(foundClient).contains(toBeFound);
+	}
+	
+	@Test
+	@DisplayName("Find purchase by id")
+	void testFindClientByIdWhenExists(){
+		Client client = new Client("clientToAddPurchase");
+		client.setPurchases(new ArrayList<Purchase>());
+		addTestClientToDatabase(client);
+		Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
+		purchase.setClient(client);
+		Purchase purchaseToBeFound = new Purchase(SECOND_TEST_DATE, 5.0);
+		purchaseToBeFound.setClient(client);
+		sessionFactory.inTransaction(session -> {
+			Client c = session.find(Client.class, client.getId());
+			session.persist(purchase);
+			session.persist(purchaseToBeFound);
+			c.getPurchases().add(purchase);
+			c.getPurchases().add(purchase);
+			session.merge(client);
+		});
+		
+		Optional<Purchase> foundPurchase = service.findPurchaseById(2);
+		assertThat(foundPurchase).contains(purchaseToBeFound);
+	}
 	
 	private List<Client> readAllClientFromDatabase() {
 		return sessionFactory

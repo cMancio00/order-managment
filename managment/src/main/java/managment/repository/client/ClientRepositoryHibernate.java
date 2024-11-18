@@ -1,6 +1,7 @@
 package managment.repository.client;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.Session;
 
@@ -14,8 +15,8 @@ public class ClientRepositoryHibernate implements ClientRepository {
 	}
 
 	@Override
-	public Client findById(int id, Session session) {
-		return session.find(Client.class, id);
+	public Optional<Client> findById(int id, Session session) {
+		return Optional.ofNullable(session.find(Client.class, id));
 	}
 
 	@Override
