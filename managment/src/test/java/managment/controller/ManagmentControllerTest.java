@@ -1,11 +1,14 @@
 package managment.controller;
 
 import static java.util.Arrays.asList;
+import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +52,29 @@ class ManagmentControllerTest {
 		InOrder inOrder = inOrder(service,view);
 		inOrder.verify(service).addClient(toAdd);
 		inOrder.verify(view).clientAdded(toAdd);
+	}
+	
+	@Test
+	@DisplayName("Remove client when existing")
+	void testRemoveClientWhenExisting(){
+		Client toDelete = new Client(1, "toDelete");
+		when(service.findClientById(1)).thenReturn(Optional.of(toDelete));
+		controller.remove(toDelete);
+		InOrder inOrder = inOrder(service,view);
+		inOrder.verify(service).findClientById(1);
+		inOrder.verify(view).clientRemoved(toDelete);
+	}
+	
+	@Test
+	@DisplayName("Remove client when not existing")
+	void testRemoveClientWhenNotExisting(){
+		Client toDelete = new Client(1, "toDelete");
+		when(service.findClientById(1)).thenReturn(Optional.empty());
+		controller.remove(toDelete);
+		InOrder inOrder = inOrder(service,view);
+		inOrder.verify(service).findClientById(1);
+		inOrder.verify(view).showClientRemovedError("Client [id=1, name=toDelete] not found", toDelete);
+		verifyNoMoreInteractions(ignoreStubs(service));
 	}
 
 	

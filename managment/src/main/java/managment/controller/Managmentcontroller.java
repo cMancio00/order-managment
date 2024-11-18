@@ -1,6 +1,7 @@
 package managment.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import managment.model.Client;
 import managment.service.PurchaseManagmentService;
@@ -26,5 +27,16 @@ public class Managmentcontroller {
 		service.addClient(toAdd);
 		view.clientAdded(toAdd);
 	}
+
+	public void remove(Client toDelete) {
+		Optional<Client> foundClient = service.findClientById(toDelete.getId());
+		foundClient.ifPresentOrElse(client -> {
+			service.deleteClient(client);
+			view.clientRemoved(client);
+		},
+			() -> view.showClientRemovedError(toDelete.toString() + " not found", toDelete));
+		
+	}
+
 
 }

@@ -2,6 +2,7 @@ package managment.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.SessionFactory;
 
@@ -64,6 +65,11 @@ public class PurchaseManagmentService {
 
 	public List<Purchase> findallPurchases(Client client) {
 		return sessionFactory.fromTransaction(session -> client.getPurchases());
+	}
+
+	public Optional<Client> findClientById(int id) {
+		return null;
+		
 	}
 
 }

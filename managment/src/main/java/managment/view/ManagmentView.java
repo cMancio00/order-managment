@@ -10,4 +10,8 @@ public interface ManagmentView {
 
 	void clientAdded(Client toAdd);
 
+	void clientRemoved(Client toDelete);
+
+	void showClientRemovedError(String string, Client toDelete);
+
 }
