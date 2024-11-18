@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import managment.model.Client;
+import managment.model.Purchase;
 import managment.service.PurchaseManagmentService;
 import managment.view.ManagmentView;
 
@@ -34,7 +35,17 @@ public class Managmentcontroller {
 			service.deleteClient(client);
 			view.clientRemoved(client);
 		},
-			() -> view.showClientRemovedError(toDelete.toString() + " not found", toDelete));
+			() -> view.showClientNotFoundError(toDelete.toString() + " not found", toDelete));
+		
+	}
+
+	public void findAllPurchasesOf(Client selectedClient) {
+		Optional<Client> foundClient = service.findClientById(selectedClient.getId());
+		foundClient.ifPresentOrElse(client -> {
+			List<Purchase> purchases = service.findallPurchases(foundClient.get());
+			view.showAllPurchases(purchases);
+		},
+			() -> view.showClientNotFoundError(selectedClient.toString() + " not found", selectedClient));
 		
 	}
 

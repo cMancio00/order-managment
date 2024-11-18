@@ -7,6 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,12 +21,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import managment.model.Client;
+import managment.model.Purchase;
 import managment.service.PurchaseManagmentService;
 import managment.view.ManagmentView;
 
 @DisplayName("Controller Tests")
 @ExtendWith(MockitoExtension.class)
 class ManagmentControllerTest {
+	
+	private static final LocalDateTime TEST_DATE = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 	
 	@Mock
 	private PurchaseManagmentService service;
@@ -73,10 +78,37 @@ class ManagmentControllerTest {
 		controller.remove(toDelete);
 		InOrder inOrder = inOrder(service,view);
 		inOrder.verify(service).findClientById(1);
-		inOrder.verify(view).showClientRemovedError("Client [id=1, name=toDelete] not found", toDelete);
+		inOrder.verify(view).showClientNotFoundError("Client [id=1, name=toDelete] not found", toDelete);
 		verifyNoMoreInteractions(ignoreStubs(service));
 	}
 
+	@Test
+	@DisplayName("Find all purchase of an existing selected client")
+	void findAllPurchaseOfSelectedClient(){
+		Client selectedClient = new Client(1, "selectedClient");
+		List<Purchase> purchases = asList(
+				new Purchase(TEST_DATE, 10.0),
+				new Purchase(TEST_DATE, 5.0));
+		when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
+		when(service.findallPurchases(selectedClient)).thenReturn(purchases);
+		controller.findAllPurchasesOf(selectedClient);
+		InOrder inOrder = inOrder(service,view);
+		inOrder.verify(service).findClientById(1);
+		inOrder.verify(service).findallPurchases(selectedClient);
+		inOrder.verify(view).showAllPurchases(purchases);
+	}
+	
+	@Test
+	@DisplayName("Find all purchase when selected client do not exists")
+	void findAllPurchaseOfNonExistingClient(){
+		Client selectedClient = new Client(1, "selectedClient");
+		when(service.findClientById(1)).thenReturn(Optional.empty());
+		controller.findAllPurchasesOf(selectedClient);
+		InOrder inOrder = inOrder(service,view);
+		inOrder.verify(service).findClientById(1);
+		inOrder.verify(view).showClientNotFoundError("Client [id=1, name=selectedClient] not found", selectedClient);;
+		verifyNoMoreInteractions(ignoreStubs(service));
+	}
 	
 	
 

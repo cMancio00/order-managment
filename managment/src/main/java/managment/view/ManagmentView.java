@@ -3,6 +3,7 @@ package managment.view;
 import java.util.List;
 
 import managment.model.Client;
+import managment.model.Purchase;
 
 public interface ManagmentView {
 
@@ -12,6 +13,8 @@ public interface ManagmentView {
 
 	void clientRemoved(Client toDelete);
 
-	void showClientRemovedError(String string, Client toDelete);
+	void showAllPurchases(List<Purchase> purchases);
+
+	void showClientNotFoundError(String string, Client client);
 
 }
