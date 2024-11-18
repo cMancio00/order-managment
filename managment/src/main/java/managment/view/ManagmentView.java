@@ -17,4 +17,6 @@ public interface ManagmentView {
 
 	void showClientNotFoundError(String string, Client client);
 
+	void purchaseAdded(Purchase toAdd);
+
 }

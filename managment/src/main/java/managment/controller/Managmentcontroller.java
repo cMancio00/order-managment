@@ -35,7 +35,7 @@ public class Managmentcontroller {
 			service.deleteClient(client);
 			view.clientRemoved(client);
 		},
-			() -> view.showClientNotFoundError(toDelete.toString() + " not found", toDelete));
+			() -> handleClientNotFound(toDelete));
 		
 	}
 
@@ -45,9 +45,22 @@ public class Managmentcontroller {
 			List<Purchase> purchases = service.findallPurchases(foundClient.get());
 			view.showAllPurchases(purchases);
 		},
-			() -> view.showClientNotFoundError(selectedClient.toString() + " not found", selectedClient));
+			() -> handleClientNotFound(selectedClient));
 		
 	}
 
+
+	public void addPurchaseToSelectedClient(Client selectedClient, Purchase toAdd) {
+		Optional<Client> foundClient = service.findClientById(selectedClient.getId());
+		foundClient.ifPresentOrElse(client -> {
+			service.addPurchaseToClient(client, toAdd);
+			view.purchaseAdded(toAdd);
+		},
+				() -> handleClientNotFound(selectedClient));
+	}
+
+	private void handleClientNotFound(Client client) {
+		view.showClientNotFoundError(client.toString() + " not found", client);
+	}
 
 }

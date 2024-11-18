@@ -110,6 +110,33 @@ class ManagmentControllerTest {
 		verifyNoMoreInteractions(ignoreStubs(service));
 	}
 	
+	@Test
+	@DisplayName("Add purchase to selected client when exists")
+	void testAddPurchaseToSelectedClientWhenExists(){
+		Client selectedClient = new Client(1, "selectedClient");
+		Purchase toAdd = new Purchase(1, TEST_DATE, 5.0);
+		when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
+
+		controller.addPurchaseToSelectedClient(selectedClient, toAdd);
+		InOrder inOrder = inOrder(service,view);
+		inOrder.verify(service).findClientById(1);
+		inOrder.verify(service).addPurchaseToClient(selectedClient, toAdd);
+		inOrder.verify(view).purchaseAdded(toAdd);
+	}
+	
+	@Test
+	@DisplayName("Add purchase to selected client when client do not exists")
+	void testAddPurchaseToSelectedClientWhenClientDoNotExists(){
+		Client selectedClient = new Client(1, "selectedClient");
+		Purchase toAdd = new Purchase(1, TEST_DATE, 5.0);
+		when(service.findClientById(1)).thenReturn(Optional.empty());
+
+		controller.addPurchaseToSelectedClient(selectedClient, toAdd);
+		InOrder inOrder = inOrder(service,view);
+		inOrder.verify(service).findClientById(1);
+		inOrder.verify(view).showClientNotFoundError("Client [id=1, name=selectedClient] not found", selectedClient);
+		verifyNoMoreInteractions(service);
+	}
 	
 
 }
