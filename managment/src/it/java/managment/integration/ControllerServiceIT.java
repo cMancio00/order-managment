@@ -2,6 +2,10 @@ package managment.integration;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.verify;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
@@ -21,6 +25,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import managment.controller.Managmentcontroller;
 import managment.model.Client;
+import managment.model.Purchase;
 import managment.repository.client.ClientRepository;
 import managment.repository.client.ClientRepositoryHibernate;
 import managment.repository.purchase.PurchaseRepository;
@@ -39,6 +44,8 @@ class ControllerServiceIT {
 	public static final MySQLContainer mysql = new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
 			.withDatabaseName("it-db").withUsername("manager").withPassword("it");
 
+	private static final LocalDateTime TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
+	
 	private static SessionFactory sessionFactory;
 
 	private ClientRepository clientRepository;
@@ -83,8 +90,8 @@ class ControllerServiceIT {
 	@Test
 	@DisplayName("Find all Clients when a client is present should return it as list")
 	void testFindAllClients() {
-		addClientToDatabase("firstClient");
-		addClientToDatabase("secondClient");
+		addClientToDatabase(new Client("firstClient"));
+		addClientToDatabase(new Client("secondClient"));
 		controller.findAllClients();
 		verify(view).showAllClients(asList(
 				new Client(1,"firstClient"),
@@ -99,9 +106,38 @@ class ControllerServiceIT {
 		verify(view).clientAdded(toAdd);
 	}
 	
-	private void addClientToDatabase(String name) {
+	@Test
+	@DisplayName("Remove client when existing")
+	void testRemoveClientWhenExisting(){
+		Client toDelete = new Client(1, "toDelete");
+		addClientToDatabase(new Client("toDelete"));
+		controller.remove(toDelete);
+		verify(view).clientRemoved(new Client(1, "toDelete"));
+	}
+	
+	@Test
+	@DisplayName("Find all purchase of an existing selected client")
+	void findAllPurchaseOfSelectedClient(){
+		Client selectedClient = new Client("selectedClient");
+		selectedClient.setPurchases(new ArrayList<Purchase>());
+		addClientToDatabase(selectedClient);
+		Purchase existingPurchase = new Purchase(TEST_DATE, 10.0);
+		existingPurchase.setClient(selectedClient);
+
+		sessionFactory.inTransaction(session -> {
+			Client client = session.find(Client.class, selectedClient.getId());
+			session.persist(existingPurchase);
+			client.getPurchases().add(existingPurchase);
+			session.merge(client);
+		});
+		
+		controller.findAllPurchasesOf(selectedClient);
+		verify(view).showAllPurchases(asList(new Purchase(1, TEST_DATE, 10.0)));
+	}
+	
+	private void addClientToDatabase(Client client) {
 		sessionFactory.inTransaction(session ->
-			session.merge(new Client(name)));
+			session.persist(client));
 	}
 
 }
