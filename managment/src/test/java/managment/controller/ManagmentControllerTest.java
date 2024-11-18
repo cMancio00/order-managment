@@ -1,6 +1,7 @@
 package managment.controller;
 
 import static java.util.Arrays.asList;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,6 +41,15 @@ class ManagmentControllerTest {
 		verify(view).showAllClients(clients);
 	}
 	
+	@Test
+	@DisplayName("Add client")
+	void testAddClient(){
+		Client toAdd = new Client(1, "toAdd");
+		controller.add(toAdd);
+		InOrder inOrder = inOrder(service,view);
+		inOrder.verify(service).addClient(toAdd);
+		inOrder.verify(view).clientAdded(toAdd);
+	}
 
 	
 	

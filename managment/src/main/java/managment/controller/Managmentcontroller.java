@@ -22,4 +22,9 @@ public class Managmentcontroller {
 		
 	}
 
+	public void add(Client toAdd) {
+		service.addClient(toAdd);
+		view.clientAdded(toAdd);
+	}
+
 }

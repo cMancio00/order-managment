@@ -8,4 +8,6 @@ public interface ManagmentView {
 
 	void showAllClients(List<Client> clients);
 
+	void clientAdded(Client toAdd);
+
 }
