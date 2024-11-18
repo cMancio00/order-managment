@@ -144,7 +144,7 @@ class ManagmentControllerTest {
 			controller.findAllPurchasesOf(selectedClient);
 			InOrder inOrder = inOrder(service,view);
 			inOrder.verify(service).findClientById(1);
-			inOrder.verify(view).showClientNotFoundError("Client [id=1, name=selectedClient] not found", selectedClient);;
+			inOrder.verify(view).showClientNotFoundError("Client [id=1, name=selectedClient] not found", selectedClient);
 			verifyNoMoreInteractions(ignoreStubs(service));
 		}
 		
