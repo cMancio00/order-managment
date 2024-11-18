@@ -135,6 +135,19 @@ class ControllerServiceIT {
 		verify(view).showAllPurchases(asList(new Purchase(1, TEST_DATE, 10.0)));
 	}
 	
+	@Test
+	@DisplayName("Add purchase to selected client when exists")
+	void testAddPurchaseToSelectedClientWhenExists(){
+		Client selectedClient = new Client("selectedClient");
+		addClientToDatabase(selectedClient);
+		Purchase toAdd = new Purchase(TEST_DATE, 5.0);
+		
+		controller.addPurchaseToSelectedClient(selectedClient, toAdd);
+		verify(view).purchaseAdded(toAdd);
+	}
+	
+	
+	
 	private void addClientToDatabase(Client client) {
 		sessionFactory.inTransaction(session ->
 			session.persist(client));
