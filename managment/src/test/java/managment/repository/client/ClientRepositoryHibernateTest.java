@@ -3,6 +3,7 @@ package managment.repository.client;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -48,17 +49,18 @@ class ClientRepositoryHibernateTest {
 		@DisplayName("Find by id when Client is preset")
 		@Test
 		void testFindByIdWhenIsPresent(){
-			Client found = sessionFactory.fromTransaction(session -> {
-				session.persist(new Client("toBeFound"));
-				return clientRepository.findById(1,session);
+			addClientToDatabase("notToBeFound");
+			addClientToDatabase("toBeFound");
+			Optional<Client> found = sessionFactory.fromTransaction(session -> {
+				return clientRepository.findById(2, session);
 			});
-			assertThat(found).isEqualTo(new Client(1,"toBeFound"));
+			assertThat(found).contains(new Client(2, "toBeFound"));
 		}
 		
 		@DisplayName("Update Client when is present")
 		@Test
 		void testUpdate(){
-			addTestClientToDatabase("toBeUpdated");
+			addClientToDatabase("toBeUpdated");
 			Client toUpdate = sessionFactory.fromSession(session -> 
 				session.find(Client.class, 1));
 			toUpdate.setName("updatedName");
@@ -69,8 +71,8 @@ class ClientRepositoryHibernateTest {
 		@DisplayName("Delete Client when is present")
 		@Test
 		void testDeleteWhenClientIsPresent(){
-			addTestClientToDatabase("notToBeDeleted");	
-			addTestClientToDatabase("toBeDeleted");
+			addClientToDatabase("notToBeDeleted");	
+			addClientToDatabase("toBeDeleted");
 			sessionFactory.inTransaction(session -> {
 				Client toDelete = session.find(Client.class, 2);
 				clientRepository.delete(toDelete, session);
@@ -88,8 +90,8 @@ class ClientRepositoryHibernateTest {
 		
 		@Test
 		void testFindAllWhenClientsArePresent(){
-			addTestClientToDatabase("firstClient");
-			addTestClientToDatabase("secondClient");
+			addClientToDatabase("firstClient");
+			addClientToDatabase("secondClient");
 			List<Client> clients = sessionFactory.fromSession(session -> clientRepository.findAll(session));
 			assertThat(clients).containsExactly(
 					new Client(1,"firstClient"),
@@ -101,15 +103,14 @@ class ClientRepositoryHibernateTest {
 	@Nested
 	@DisplayName("Error Cases")
 	class ErrorCases{
-		@DisplayName("Find by Id when Client is not present should return null")
+		@DisplayName("Find by Id when Client is not present should return empty optional")
 		@Test
 		void testFindByIdWhenIsNotPresent(){
-			Client found = sessionFactory.fromTransaction(session -> {
+			Optional<Client> found = sessionFactory.fromTransaction(session -> {
 				return clientRepository.findById(1,session);
 			});
-			assertThat(found).isNull();
+			assertThat(found).isEmpty();
 		}
-	
 	}
 	
 	private List<Client> readAllClientFromDatabase() {
@@ -117,7 +118,7 @@ class ClientRepositoryHibernateTest {
 				.fromSession(session -> session.createSelectionQuery("from Client", Client.class).getResultList());
 	}
 	
-	private void addTestClientToDatabase(String name) {
+	private void addClientToDatabase(String name) {
 		sessionFactory.inTransaction(session ->
 			session.persist(new Client(name)));
 	}
