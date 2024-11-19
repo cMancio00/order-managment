@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -34,16 +33,17 @@ import org.junit.jupiter.api.Test;
 @Testcontainers
 @DisplayName("Service-Repository IntegrationTest")
 class ServiceRepositoryIT {
-
+		
 	private static String mysqlVersion = System.getProperty("mysql.version", "9.1.0");
+
+	@SuppressWarnings({ "rawtypes", "resource" })
+	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
+			.withDatabaseName("Service-Repository-db").withUsername("manager").withPassword("it").withReuse(true);
+
 	private static final LocalDateTime FIRST_TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
 	private static final LocalDateTime SECOND_TEST_DATE = LocalDate.of(2024, Month.FEBRUARY, 1).atStartOfDay();
-	
-	@Container
-	@SuppressWarnings({ "rawtypes", "resource" })
-	public static final MySQLContainer mysql = new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
-			.withDatabaseName("it-db").withUsername("manager").withPassword("it");
 
+	
 	private static SessionFactory sessionFactory;
 
 	private ClientRepository clientRepository;
@@ -54,6 +54,7 @@ class ServiceRepositoryIT {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
+		mysql.start();
 		Properties mysqlProperties = new Properties();
 		mysqlProperties.setProperty("hibernate.connection.url", mysql.getJdbcUrl());
 		mysqlProperties.setProperty("hibernate.connection.username", mysql.getUsername());
