@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -39,10 +38,9 @@ import managment.view.ManagmentView;
 class ControllerServiceIT {
 
 	private static String mysqlVersion = System.getProperty("mysql.version", "9.1.0");
-	@Container
 	@SuppressWarnings({ "rawtypes", "resource" })
-	public static final MySQLContainer mysql = new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
-			.withDatabaseName("it-db").withUsername("manager").withPassword("it");
+	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
+			.withDatabaseName("Controller-Service-db").withUsername("manager").withPassword("it").withReuse(true);
 
 	private static final LocalDateTime TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
 	
@@ -62,6 +60,7 @@ class ControllerServiceIT {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
+		mysql.start();
 		Properties mysqlProperties = new Properties();
 		mysqlProperties.setProperty("hibernate.connection.url", mysql.getJdbcUrl());
 		mysqlProperties.setProperty("hibernate.connection.username", mysql.getUsername());
