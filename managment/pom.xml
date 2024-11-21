@@ -42,7 +42,7 @@
 		</sonar.issue.ignore.multicriteria.eS2699.ruleKey>
 		<!-- Test case without assertions -->
 		<sonar.issue.ignore.multicriteria.eS2699.resourceKey>
-			**/*SwingTest.java
+			**/*Swing*.java
 		</sonar.issue.ignore.multicriteria.eS2699.resourceKey>
 		<!-- Local variables names should comply with a naming convention -->
 		<sonar.issue.ignore.multicriteria.eS117.resourceKey>
@@ -234,11 +234,13 @@
 							<!-- Classes to mutate -->
 							<param>**.repository.*</param>
 							<param>**.service.*</param>
+							<param>**.controller.*</param>
 						</targetClasses>
 						<targetTests>
 							<!-- Test to use -->
 							<param>**.repository.*</param>
 							<param>managment.service.*</param>
+							<param>**.controller.*</param>
 						</targetTests>
 						<mutators>
 							<mutator>STRONGER</mutator>

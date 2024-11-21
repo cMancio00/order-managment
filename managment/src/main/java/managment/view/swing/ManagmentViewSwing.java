@@ -7,7 +7,6 @@ import javax.swing.border.EmptyBorder;
 
 import managment.model.Client;
 import managment.model.Purchase;
-import managment.view.ManagmentView;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -22,9 +21,8 @@ import javax.swing.ListSelectionModel;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.List;
 
-public class ManagmentViewSwing extends JFrame implements ManagmentView{
+public class ManagmentViewSwing extends JFrame{
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -140,6 +138,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 		listClients.addListSelectionListener(e -> {
 			btnDeleteSelectedClientEnabler();
+			btnDeleteSelectedPurchaseEnabler();
 			btnAddAmmountEnabler();
 		});
 		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -194,53 +193,6 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		gbc_messageLable.gridx = 0;
 		gbc_messageLable.gridy = 6;
 		contentPane.add(messageLable, gbc_messageLable);
-		
-	}
-
-	@Override
-	public void showAllClients(List<Client> clients) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void clientAdded(Client toAdd) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clientRemoved(Client toDelete) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showAllPurchases(List<Purchase> purchases) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showClientNotFoundError(String string, Client client) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void purchaseAdded(Purchase toAdd) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void purchaseRemoved(Purchase toDelete) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showPurchaseNotFoundError(String string, Purchase toDelete) {
-		// TODO Auto-generated method stub
 		
 	}
 

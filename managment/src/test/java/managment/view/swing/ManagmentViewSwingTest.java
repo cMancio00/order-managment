@@ -104,24 +104,39 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	}
 	
 	@Test
-	public void testDeletePurchaseButtonShouldBeEnabledOnlyWhenAClientAndAPurchaseIsSelected() {
-		GuiActionRunner.execute(() -> 
-		managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
-		
+	public void testDeletePurchaseButtonShouldBeDisabledWhenAClientAndAPurchaseIsNotSelected() {
+		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Delete Selected Purchase"));
+
+		deleteButton.requireDisabled();
+
+		GuiActionRunner.execute(() -> managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
+
 		window.list("clientList").selectItem(0);
-		
+		deleteButton.requireDisabled();
+
+		GuiActionRunner
+				.execute(() -> managmentViewSwing.getListPurchaseModel().addElement(new Purchase(TEST_DATE, 10.0)));
+
+		window.list("clientList").clearSelection();
+		window.list("purchaseList").selectItem(0);
+		deleteButton.requireDisabled();
+
+		window.list("clientList").selectItem(0);
+		deleteButton.requireEnabled();
+	}
+	
+	@Test
+	public void testDeletePurchaseButtonShouldBeEnabledWhenAClientAndAPurchaseIsSelected() {
+		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Delete Selected Purchase"));
+
+		GuiActionRunner.execute(() -> 
+			managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
 		GuiActionRunner.execute(() -> 
 			managmentViewSwing.getListPurchaseModel().addElement(new Purchase(TEST_DATE, 10.0)));
-		
+
+		window.list("clientList").selectItem(0);
 		window.list("purchaseList").selectItem(0);
-		JButtonFixture deleteButton =
-				window.button(JButtonMatcher.withText("Delete Selected Purchase"));
-				deleteButton.requireEnabled();
-				window.list("purchaseList").clearSelection();
-				deleteButton.requireDisabled();
-				
-		window.list("clientList").clearSelection();
-		deleteButton.requireDisabled();
+		deleteButton.requireEnabled();
 	}
 	
 }
