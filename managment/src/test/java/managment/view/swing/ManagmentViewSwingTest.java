@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 
+import javax.swing.DefaultListModel;
+
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.core.matcher.JLabelMatcher;
@@ -170,12 +172,35 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	public void testClientAddedShouldAddTheClientToTheListAndResetTheMessageLabel() {
 		Client client = new Client(1, "client");
 		GuiActionRunner.execute(
-		() ->
-		managmentViewSwing.clientAdded(new Client(1, "client"))
+			() ->
+			managmentViewSwing.clientAdded(new Client(1, "client"))
 		);
 		String[] listContents = window.list("clientList").contents();
 		assertThat(listContents).containsExactly(client.toString());
 		window.label("messageLable").requireText(" ");
 	}
 	
+	@Test
+	public void testStudentRemovedShouldRemoveTheStudentFromTheListAndResetTheErrorLabel() {
+	// setup
+	Client toRemove = new Client(1, "toRemove");
+	Client client = new Client(2, "client");
+	GuiActionRunner.execute(
+		() -> {
+		DefaultListModel<Client> listClientModel =
+			managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(toRemove);
+			listClientModel.addElement(client);
+	}
+	);
+	// execute
+	GuiActionRunner.execute(
+	() ->
+	managmentViewSwing.clientRemoved(new Client(1, "toRemove"))
+	);
+	// verify
+	String[] listContents = window.list("clientList").contents();
+	assertThat(listContents).containsExactly(client.toString());
+	window.label("messageLable").requireText(" ");
+	}
 }

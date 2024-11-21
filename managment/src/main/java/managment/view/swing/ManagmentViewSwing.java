@@ -229,13 +229,17 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	@Override
 	public void clientAdded(Client toAdd) {
 		listClientsModel.addElement(toAdd);
-		messageLable.setText(" ");
+		resetMessageLable();
 	}
 
 	@Override
 	public void clientRemoved(Client toDelete) {
-		// TODO Auto-generated method stub
-		
+		listClientsModel.removeElement(toDelete);
+		resetMessageLable();
+	}
+
+	private void resetMessageLable() {
+		messageLable.setText(" ");
 	}
 
 	@Override
