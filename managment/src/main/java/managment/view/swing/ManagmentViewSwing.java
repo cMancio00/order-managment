@@ -244,14 +244,12 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	@Override
 	public void showAllPurchases(List<Purchase> purchases) {
-		// TODO Auto-generated method stub
-		
+		purchases.stream().forEach(listPurchaseModel::addElement);
 	}
 
 	@Override
 	public void showClientNotFoundError(String string, Client client) {
 		messageLable.setText(client.toString() + " not found");
-		
 	}
 
 	@Override
