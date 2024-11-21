@@ -44,7 +44,7 @@ jobs:
 
       - name: Build with Maven
         run: |
-            mvn clean verify -Pjacoco,mutation-testing
+            xvfb-run mvn clean verify -Pjacoco,mutation-testing
         working-directory: ${{ env.workdir }}
 
       - name: Generate JUnit Report
