@@ -24,18 +24,30 @@
 			**/app/*
 		</sonar.coverage.exclusions>
 		<sonar.junit.reportPaths>
-			${project.build.directory}/surefire-reports
+			${project.build.directory}/surefire-reports,
+			${project.build.directory}/failsafe-reports
 		</sonar.junit.reportPaths>
 		<!-- Circular dependencies between classes in the same package should be
 		resolved
 		This is the way of how hibernate handles relations -->
-		<sonar.issue.ignore.multicriteria>e01</sonar.issue.ignore.multicriteria>
+		<sonar.issue.ignore.multicriteria>e01,eS2699,eS117</sonar.issue.ignore.multicriteria>
 		<sonar.issue.ignore.multicriteria.e01.ruleKey>
 			javaarchitecture:S7027
 		</sonar.issue.ignore.multicriteria.e01.ruleKey>
 		<sonar.issue.ignore.multicriteria.e01.resourceKey>
 			**/Client.java
 		</sonar.issue.ignore.multicriteria.e01.resourceKey>
+		<sonar.issue.ignore.multicriteria.eS2699.ruleKey>
+			java:S2699
+		</sonar.issue.ignore.multicriteria.eS2699.ruleKey>
+		<!-- Test case without assertions -->
+		<sonar.issue.ignore.multicriteria.eS2699.resourceKey>
+			**/*SwingTest.java
+		</sonar.issue.ignore.multicriteria.eS2699.resourceKey>
+		<!-- Local variables names should comply with a naming convention -->
+		<sonar.issue.ignore.multicriteria.eS117.resourceKey>
+			**/*Swing.java
+		</sonar.issue.ignore.multicriteria.eS117.resourceKey>
 		<!-- end Sonar-->
 		<jupiter.version>5.11.2</jupiter.version>
 		<assertj.version>3.26.3</assertj.version>
