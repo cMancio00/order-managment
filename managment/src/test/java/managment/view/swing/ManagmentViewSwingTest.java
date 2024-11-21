@@ -167,7 +167,7 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	}
 	
 	@Test
-	public void testStudentAddedShouldAddTheStudentToTheListAndResetTheErrorLabel() {
+	public void testClientAddedShouldAddTheClientToTheListAndResetTheMessageLabel() {
 		Client client = new Client(1, "client");
 		GuiActionRunner.execute(
 		() ->
