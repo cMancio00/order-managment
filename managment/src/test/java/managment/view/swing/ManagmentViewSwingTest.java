@@ -15,6 +15,9 @@ import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import managment.model.Client;
 import managment.model.Purchase;
 
@@ -137,6 +140,21 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		window.list("clientList").selectItem(0);
 		window.list("purchaseList").selectItem(0);
 		deleteButton.requireEnabled();
+	}
+	
+	
+	@Test
+	public void testShowAllClientsShouldAddClientDescriptionsToTheList() {
+		Client client1 = new Client(1, "client1");
+		Client client2 = new Client(2, "client2");
+		
+		GuiActionRunner.execute(() ->
+		managmentViewSwing.showAllClients(asList(client1, client2))
+		);
+		
+		String[] listContents = window.list("clientList").contents();
+		assertThat(listContents)
+		.containsExactly(client1.toString(), client2.toString());
 	}
 	
 }

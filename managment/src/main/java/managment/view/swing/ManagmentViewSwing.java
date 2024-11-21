@@ -7,6 +7,7 @@ import javax.swing.border.EmptyBorder;
 
 import managment.model.Client;
 import managment.model.Purchase;
+import managment.view.ManagmentView;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -21,8 +22,9 @@ import javax.swing.ListSelectionModel;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
-public class ManagmentViewSwing extends JFrame{
+public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -217,6 +219,53 @@ public class ManagmentViewSwing extends JFrame{
 		btnDeleteSelectedPurchase.setEnabled(
 		listClients.getSelectedIndex() != -1 &&
 		listPurchases.getSelectedIndex() != -1);
+	}
+
+	@Override
+	public void showAllClients(List<Client> clients) {
+		clients.stream().forEach(listClientsModel::addElement);
+	}
+
+	@Override
+	public void clientAdded(Client toAdd) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientRemoved(Client toDelete) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showAllPurchases(List<Purchase> purchases) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showClientNotFoundError(String string, Client client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void purchaseAdded(Purchase toAdd) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void purchaseRemoved(Purchase toDelete) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showPurchaseNotFoundError(String string, Purchase toDelete) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
