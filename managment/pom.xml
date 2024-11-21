@@ -126,7 +126,7 @@
 
 		<dependency>
 			<groupId>org.assertj</groupId>
-			<artifactId>assertj-swing</artifactId>
+			<artifactId>assertj-swing-junit</artifactId>
 			<version>${assertj-swing.version}</version>
 			<scope>test</scope>
 		</dependency>
