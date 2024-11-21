@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import managment.model.Client;
 import managment.model.Purchase;
@@ -56,7 +56,7 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		
 		window.button(JButtonMatcher.withText("Delete Selected Client")).requireDisabled();
 		window.button(JButtonMatcher.withText("Delete Selected Purchase")).requireDisabled();
-		window.label(JLabelMatcher.withText(" "));
+		window.label("messageLable").requireText(" ");
 	}
 
 	@Test
@@ -155,6 +155,15 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		String[] listContents = window.list("clientList").contents();
 		assertThat(listContents)
 		.containsExactly(client1.toString(), client2.toString());
+	}
+	
+	@Test
+	public void testShowClientNotFoundErrorShouldShowMessageInMessageLable(){
+		Client client = new Client(1, "client");
+		GuiActionRunner.execute(
+				() -> managmentViewSwing.showClientNotFoundError("Client [id=1, name=client] not found", client)
+		);
+		window.label("messageLable").requireText("Client [id=1, name=client] not found");
 	}
 	
 }

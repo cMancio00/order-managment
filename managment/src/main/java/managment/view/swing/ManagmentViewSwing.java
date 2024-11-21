@@ -93,6 +93,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		txtClientName.setColumns(10);
 		
 		lblPurchaseAmmount = new JLabel("Purchase Ammount");
+		lblPurchaseAmmount.setName("purchaseAmmountLable");
 		GridBagConstraints gbc_lblPurchaseAmmount = new GridBagConstraints();
 		gbc_lblPurchaseAmmount.insets = new Insets(0, 0, 5, 5);
 		gbc_lblPurchaseAmmount.gridx = 3;
@@ -187,10 +188,9 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(btnDeleteSelectedPurchase, gbc_btnDeleteSelectedPurchase);
 		
 		messageLable = new JLabel(" ");
-		messageLable.setName("messsageLable");
+		messageLable.setName("messageLable");
 		GridBagConstraints gbc_messageLable = new GridBagConstraints();
 		gbc_messageLable.gridwidth = 5;
-		gbc_messageLable.fill = GridBagConstraints.HORIZONTAL;
 		gbc_messageLable.insets = new Insets(0, 0, 0, 5);
 		gbc_messageLable.gridx = 0;
 		gbc_messageLable.gridy = 6;
@@ -246,7 +246,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	@Override
 	public void showClientNotFoundError(String string, Client client) {
-		// TODO Auto-generated method stub
+		messageLable.setText(client.toString() + " not found");
 		
 	}
 
