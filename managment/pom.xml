@@ -45,6 +45,9 @@
 			**/*Swing*.java
 		</sonar.issue.ignore.multicriteria.eS2699.resourceKey>
 		<!-- Local variables names should comply with a naming convention -->
+		<sonar.issue.ignore.multicriteria.eS117.ruleKey>
+			java:S117
+		</sonar.issue.ignore.multicriteria.eS117.ruleKey>
 		<sonar.issue.ignore.multicriteria.eS117.resourceKey>
 			**/*Swing.java
 		</sonar.issue.ignore.multicriteria.eS117.resourceKey>
