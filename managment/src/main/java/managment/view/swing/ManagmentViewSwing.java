@@ -265,8 +265,8 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	}
 
 	@Override
-	public void showPurchaseNotFoundError(String string, Purchase toDelete) {
-		// TODO Auto-generated method stub
+	public void showPurchaseNotFoundError(String string, Purchase purchase) {
+		messageLable.setText(purchase.toString() + " not found");
 		
 	}
 

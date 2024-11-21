@@ -195,4 +195,12 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		String[] listContents = window.list("purchaseList").contents();
 		assertThat(listContents).containsExactly(purchase1.toString(), purchase2.toString());
 	}
+	
+	@Test
+	public void testShowPurchaseNotFoundErrorShouldShowMessageInMessageLable() {
+		Purchase purchase = new Purchase(1, TEST_DATE, 10.0);
+		GuiActionRunner.execute(
+				() -> managmentViewSwing.showPurchaseNotFoundError(" ", purchase));
+		window.label("messageLable").requireText("Purchase [id=1, orderDate=2024-01-01T00:00, amount=10.0] not found");
+	}
 }
