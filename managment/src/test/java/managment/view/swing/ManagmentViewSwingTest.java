@@ -169,7 +169,7 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testStudentRemovedShouldRemoveTheStudentFromTheListAndResetTheErrorLabel() {
+	public void testStudentRemovedShouldRemoveTheStudentFromTheListAndResetTheMessageLabel() {
 		Client toRemove = new Client(1, "toRemove");
 		Client client = new Client(2, "client");
 		GuiActionRunner.execute(() -> {
@@ -202,5 +202,31 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		GuiActionRunner.execute(
 				() -> managmentViewSwing.showPurchaseNotFoundError(" ", purchase));
 		window.label("messageLable").requireText("Purchase [id=1, orderDate=2024-01-01T00:00, amount=10.0] not found");
+	}
+	
+	@Test
+	public void testPurchaseAddedShouldAddThePurchaseToTheListAndResetTheMessageLabel() {
+		Purchase purchase = new Purchase(1, TEST_DATE, 10.0);
+		GuiActionRunner.execute(() -> managmentViewSwing.purchaseAdded(new Purchase(1, TEST_DATE, 10.0)));
+		String[] listContents = window.list("purchaseList").contents();
+		assertThat(listContents).containsExactly(purchase.toString());
+		window.label("messageLable").requireText(" ");
+	}
+	
+	@Test
+	public void testPurchaseRemovedShouldRemoveThePurchaseFromTheListAndResetTheMessageLabel() {
+		Purchase toRemove = new Purchase(1, TEST_DATE, 10.0);
+		Purchase purchase = new Purchase(2, TEST_DATE, 5.0);
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Purchase> listPurchaseModel = managmentViewSwing.getListPurchaseModel();
+			listPurchaseModel.addElement(toRemove);
+			listPurchaseModel.addElement(purchase);
+		});
+
+		GuiActionRunner.execute(() -> managmentViewSwing.purchaseRemoved(new Purchase(1, TEST_DATE, 10.0)));
+
+		String[] listContents = window.list("purchaseList").contents();
+		assertThat(listContents).containsExactly(purchase.toString());
+		window.label("messageLable").requireText(" ");
 	}
 }

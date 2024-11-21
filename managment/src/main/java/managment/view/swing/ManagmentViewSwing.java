@@ -254,14 +254,14 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	@Override
 	public void purchaseAdded(Purchase toAdd) {
-		// TODO Auto-generated method stub
-		
+		listPurchaseModel.addElement(toAdd);
+		resetMessageLable();	
 	}
 
 	@Override
 	public void purchaseRemoved(Purchase toDelete) {
-		// TODO Auto-generated method stub
-		
+		listPurchaseModel.removeElement(toDelete);
+		resetMessageLable();	
 	}
 
 	@Override
@@ -269,6 +269,5 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		messageLable.setText(purchase.toString() + " not found");
 		
 	}
-
 
 }
