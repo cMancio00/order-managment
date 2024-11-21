@@ -9,18 +9,24 @@ import javax.swing.border.EmptyBorder;
 
 import managment.model.Client;
 import managment.model.Purchase;
+import managment.view.ManagmentView;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
 import java.awt.Insets;
+
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.List;
 
-public class ManagmentViewSwing extends JFrame {
+public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -34,7 +40,9 @@ public class ManagmentViewSwing extends JFrame {
 	private JButton btnDeleteSelectedClient;
 	private JButton btnDeleteSelectedPurchase;
 	private JLabel messageLable;
-
+	
+	private DefaultListModel<Client> listClientsModel;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -48,11 +56,16 @@ public class ManagmentViewSwing extends JFrame {
 				}
 		});
 	}
+	
+	DefaultListModel<Client> getListClientsModel() {
+		return listClientsModel;
+	}
 
 	/**
 	 * Create the frame.
 	 */
 	public ManagmentViewSwing() {
+		
 		setTitle("Purchase Managment View");
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setBounds(100, 100, 720, 480);
@@ -77,8 +90,15 @@ public class ManagmentViewSwing extends JFrame {
 		contentPane.add(lblClientName, gbc_lblClientName);
 		
 		txtClientName = new JTextField();
+		txtClientName.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				btnAddNewClient.setEnabled(
+						!txtClientName.getText().trim().isEmpty()
+						);
+			}
+		});
 		txtClientName.setName("clientNameBox");
-		txtClientName.setText("client name");
 		GridBagConstraints gbc_txtClientName = new GridBagConstraints();
 		gbc_txtClientName.insets = new Insets(0, 0, 5, 5);
 		gbc_txtClientName.fill = GridBagConstraints.HORIZONTAL;
@@ -95,7 +115,6 @@ public class ManagmentViewSwing extends JFrame {
 		contentPane.add(lblPurchaseAmmount, gbc_lblPurchaseAmmount);
 		
 		txtPurchaseAmmount = new JTextField();
-		txtPurchaseAmmount.setText("purchase ammount");
 		txtPurchaseAmmount.setName("purchaseAmmountBox");
 		GridBagConstraints gbc_txtPurchaseAmmount = new GridBagConstraints();
 		gbc_txtPurchaseAmmount.insets = new Insets(0, 0, 5, 0);
@@ -125,7 +144,10 @@ public class ManagmentViewSwing extends JFrame {
 		gbc_btnAddAmmount.gridy = 2;
 		contentPane.add(btnAddAmmount, gbc_btnAddAmmount);
 		
-		listClients = new JList<Client>();
+		listClientsModel = new DefaultListModel<>();
+		listClients = new JList<>(listClientsModel);
+		listClients.addListSelectionListener(e -> 
+			btnDeleteSelectedClient.setEnabled(listClients.getSelectedIndex() != -1));
 		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listClients.setName("clientList");
 		GridBagConstraints gbc_listClients = new GridBagConstraints();
@@ -176,6 +198,56 @@ public class ManagmentViewSwing extends JFrame {
 		gbc_messageLable.gridx = 0;
 		gbc_messageLable.gridy = 6;
 		contentPane.add(messageLable, gbc_messageLable);
+		
+
 	}
 
+	@Override
+	public void showAllClients(List<Client> clients) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void clientAdded(Client toAdd) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clientRemoved(Client toDelete) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showAllPurchases(List<Purchase> purchases) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showClientNotFoundError(String string, Client client) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void purchaseAdded(Purchase toAdd) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void purchaseRemoved(Purchase toDelete) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showPurchaseNotFoundError(String string, Purchase toDelete) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 }
