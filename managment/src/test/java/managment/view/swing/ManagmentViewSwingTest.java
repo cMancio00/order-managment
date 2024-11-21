@@ -166,4 +166,16 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		window.label("messageLable").requireText("Client [id=1, name=client] not found");
 	}
 	
+	@Test
+	public void testStudentAddedShouldAddTheStudentToTheListAndResetTheErrorLabel() {
+		Client client = new Client(1, "client");
+		GuiActionRunner.execute(
+		() ->
+		managmentViewSwing.clientAdded(new Client(1, "client"))
+		);
+		String[] listContents = window.list("clientList").contents();
+		assertThat(listContents).containsExactly(client.toString());
+		window.label("messageLable").requireText(" ");
+	}
+	
 }
