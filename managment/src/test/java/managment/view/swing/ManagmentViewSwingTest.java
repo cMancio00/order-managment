@@ -1,5 +1,9 @@
 package managment.view.swing;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.core.matcher.JLabelMatcher;
@@ -12,10 +16,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import managment.model.Client;
+import managment.model.Purchase;
 
 @RunWith(GUITestRunner.class)
 public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 
+	private static final LocalDateTime TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
+	
 	private ManagmentViewSwing managmentViewSwing;
 
 	private FrameFixture window;
@@ -37,10 +44,13 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		window.textBox("clientNameBox").requireEnabled();
 		window.label(JLabelMatcher.withText("Purchase Ammount"));
 		window.textBox("purchaseAmmountBox").requireEnabled();
+		
 		window.button(JButtonMatcher.withText("Add New Client")).requireDisabled();
 		window.button(JButtonMatcher.withText("Add Ammount")).requireDisabled();
+		
 		window.list("clientList");
 		window.list("purchaseList");
+		
 		window.button(JButtonMatcher.withText("Delete Selected Client")).requireDisabled();
 		window.button(JButtonMatcher.withText("Delete Selected Purchase")).requireDisabled();
 		window.label(JLabelMatcher.withText(" "));
@@ -50,10 +60,8 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	public void testWhenClientNameIsNonEmptyThenAddNewClientButtonShouldBeEnabled() {
 		window.textBox("clientNameBox").enterText("testClient");
 		window.button(JButtonMatcher.withText("Add New Client")).requireEnabled();
-	}
-
-	@Test
-	public void testWhenClientNameIsBlankThenAddNewClientButtonShouldBeDisabled() {
+		
+		window.textBox("clientNameBox").setText("");
 		window.textBox("clientNameBox").enterText(" ");
 		window.button(JButtonMatcher.withText("Add New Client")).requireDisabled();
 	}
@@ -71,6 +79,49 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 				deleteButton.requireDisabled();
 	}
 	
+	@Test
+	public void testWhenPurchaseAmmountIsNonEmptyAndClientIsSelectedThenAddPurchaseButtonShouldBeEnabled() {
+		GuiActionRunner.execute(() -> 
+		managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
+		window.list("clientList").selectItem(0);
+		
+		window.textBox("purchaseAmmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Ammount")).requireEnabled();	
+		
+		window.textBox("purchaseAmmountBox").setText("");
+		window.textBox("purchaseAmmountBox").enterText(" ");
+		window.button(JButtonMatcher.withText("Add Ammount")).requireDisabled();
+		
+		window.list("clientList").clearSelection();
+		window.button(JButtonMatcher.withText("Add Ammount")).requireDisabled();
+		
+		window.textBox("purchaseAmmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Ammount")).requireDisabled();
+		
+		window.list("clientList").selectItem(0);
+		window.button(JButtonMatcher.withText("Add Ammount")).requireEnabled();	
+		
+	}
 	
-
+	@Test
+	public void testDeletePurchaseButtonShouldBeEnabledOnlyWhenAClientAndAPurchaseIsSelected() {
+		GuiActionRunner.execute(() -> 
+		managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
+		
+		window.list("clientList").selectItem(0);
+		
+		GuiActionRunner.execute(() -> 
+			managmentViewSwing.getListPurchaseModel().addElement(new Purchase(TEST_DATE, 10.0)));
+		
+		window.list("purchaseList").selectItem(0);
+		JButtonFixture deleteButton =
+				window.button(JButtonMatcher.withText("Delete Selected Purchase"));
+				deleteButton.requireEnabled();
+				window.list("purchaseList").clearSelection();
+				deleteButton.requireDisabled();
+				
+		window.list("clientList").clearSelection();
+		deleteButton.requireDisabled();
+	}
+	
 }

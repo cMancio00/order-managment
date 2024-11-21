@@ -1,7 +1,5 @@
 package managment.view.swing;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -42,28 +40,16 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	private JLabel messageLable;
 	
 	private DefaultListModel<Client> listClientsModel;
-	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(() -> {
-				try {
-					ManagmentViewSwing frame = new ManagmentViewSwing();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-		});
-	}
-	
+	private DefaultListModel<Purchase> listPurchaseModel;
+		
 	DefaultListModel<Client> getListClientsModel() {
 		return listClientsModel;
 	}
-
-	/**
-	 * Create the frame.
-	 */
+	
+	DefaultListModel<Purchase> getListPurchaseModel() {
+		return listPurchaseModel;
+	}
+	
 	public ManagmentViewSwing() {
 		
 		setTitle("Purchase Managment View");
@@ -93,10 +79,9 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		txtClientName.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				btnAddNewClient.setEnabled(
-						!txtClientName.getText().trim().isEmpty()
-						);
+				btnAddnewClientEnabler();
 			}
+
 		});
 		txtClientName.setName("clientNameBox");
 		GridBagConstraints gbc_txtClientName = new GridBagConstraints();
@@ -115,6 +100,12 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(lblPurchaseAmmount, gbc_lblPurchaseAmmount);
 		
 		txtPurchaseAmmount = new JTextField();
+		txtPurchaseAmmount.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				btnAddAmmountEnabler();
+			}
+		});
 		txtPurchaseAmmount.setName("purchaseAmmountBox");
 		GridBagConstraints gbc_txtPurchaseAmmount = new GridBagConstraints();
 		gbc_txtPurchaseAmmount.insets = new Insets(0, 0, 5, 0);
@@ -146,8 +137,11 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		
 		listClientsModel = new DefaultListModel<>();
 		listClients = new JList<>(listClientsModel);
-		listClients.addListSelectionListener(e -> 
-			btnDeleteSelectedClient.setEnabled(listClients.getSelectedIndex() != -1));
+
+		listClients.addListSelectionListener(e -> {
+			btnDeleteSelectedClientEnabler();
+			btnAddAmmountEnabler();
+		});
 		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listClients.setName("clientList");
 		GridBagConstraints gbc_listClients = new GridBagConstraints();
@@ -158,7 +152,9 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		gbc_listClients.gridy = 3;
 		contentPane.add(listClients, gbc_listClients);
 		
-		listPurchases = new JList<Purchase>();
+		listPurchaseModel = new DefaultListModel<>();
+		listPurchases = new JList<>(getListPurchaseModel());
+		listPurchases.addListSelectionListener(e -> btnDeleteSelectedPurchaseEnabler());
 		listPurchases.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listPurchases.setName("purchaseList");
 		GridBagConstraints gbc_listPurchases = new GridBagConstraints();
@@ -199,7 +195,6 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		gbc_messageLable.gridy = 6;
 		contentPane.add(messageLable, gbc_messageLable);
 		
-
 	}
 
 	@Override
@@ -249,5 +244,28 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		
 	}
 
+	private void btnAddnewClientEnabler() {
+		btnAddNewClient.setEnabled(
+				!txtClientName.getText().trim().isEmpty()
+				);
+	}
 	
+	private void btnDeleteSelectedClientEnabler() {
+		btnDeleteSelectedClient.setEnabled(listClients.getSelectedIndex() != -1);
+	}
+	
+	private void btnAddAmmountEnabler() {
+		btnAddAmmount.setEnabled(
+				!txtPurchaseAmmount.getText().trim().isEmpty() &&
+				listClients.getSelectedIndex() != -1
+				);
+	}
+	
+	private void btnDeleteSelectedPurchaseEnabler() {
+		btnDeleteSelectedPurchase.setEnabled(
+		listClients.getSelectedIndex() != -1 &&
+		listPurchases.getSelectedIndex() != -1);
+	}
+
+
 }
