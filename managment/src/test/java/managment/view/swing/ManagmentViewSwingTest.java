@@ -16,10 +16,17 @@ import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.inOrder;
+import static java.time.LocalDateTime.now;
 
+import managment.controller.Managmentcontroller;
 import managment.model.Client;
 import managment.model.Purchase;
 
@@ -28,20 +35,32 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 
 	private static final LocalDateTime TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
 
+	@Mock
+	private Managmentcontroller managmentController;
+	
 	private ManagmentViewSwing managmentViewSwing;
 
 	private FrameFixture window;
+	
+	private AutoCloseable closeable;
 
 	@Override
 	protected void onSetUp() {
+		closeable = MockitoAnnotations.openMocks(this);
 		GuiActionRunner.execute(() -> {
 			managmentViewSwing = new ManagmentViewSwing();
+			managmentViewSwing.setManagmentController(managmentController);
 			return managmentViewSwing;
 		});
 		window = new FrameFixture(robot(), managmentViewSwing);
 		window.show();
 	}
-
+	
+	@Override
+	protected void onTearDown() throws Exception {
+	closeable.close();
+	}
+	
 	@Test
 	@GUITest
 	public void testControlsInitialStates() {
@@ -169,7 +188,7 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testStudentRemovedShouldRemoveTheStudentFromTheListAndResetTheMessageLabel() {
+	public void testClientRemovedShouldRemoveTheClientFromTheListAndResetTheMessageLabel() {
 		Client toRemove = new Client(1, "toRemove");
 		Client client = new Client(2, "client");
 		GuiActionRunner.execute(() -> {
@@ -229,4 +248,87 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		assertThat(listContents).containsExactly(purchase.toString());
 		window.label("messageLable").requireText(" ");
 	}
+	
+	@Test
+	public void testAddNewClientShouldDelegateToManagmentControllerAdd(){
+		window.textBox("clientNameBox").enterText("testClient");
+		window.button(JButtonMatcher.withText("Add New Client")).click();
+		verify(managmentController).add(new Client("testClient"));
+	}
+	
+	@Test
+	public void testDeleteClientShouldDelegateToManagmentControllerRemove(){
+		Client toRemove = new Client(1, "toRemove");
+		Client client = new Client(2, "client");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(toRemove);
+			listClientModel.addElement(client);
+		});
+
+		window.list("clientList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
+		verify(managmentController).remove(toRemove);
+	}
+	
+	@Test
+	public void testSelectingClientShouldDelegateToManagmentControllerFindAllPurchasesOf(){
+		Client client = new Client(1, "client");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(client);
+		});
+
+		window.list("clientList").selectItem(0);
+		verify(managmentController).findAllPurchasesOf(client);
+	}
+	
+	@Test
+	public void testAddPurchaseShouldDelegateToManagmentControllerAddAndFindAllPurchaseOf(){
+		Client client = new Client(1, "client");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(client);
+		});
+
+		window.list("clientList").selectItem(0);
+		window.textBox("purchaseAmmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		InOrder inOrder = inOrder(managmentController);
+		
+		inOrder.verify(managmentController).addPurchaseToSelectedClient(client,
+				new Purchase(getCurrentDate(), 10.0));
+		inOrder.verify(managmentController).findAllPurchasesOf(client);
+	}
+	
+	@Test
+	public void testDeleteSelectedPurchaseButtonShouldDelegateToManagmentControllerRemove(){
+		Client client = new Client(1, "client");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(client);
+		});
+		window.list("clientList").selectItem(0);
+		Purchase toRemove = new Purchase(1, getCurrentDate(), 10.0);
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Purchase> listPurchaseModel = managmentViewSwing.getListPurchaseModel();
+			listPurchaseModel.addElement(toRemove);
+		});
+		window.list("purchaseList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
+		InOrder inOrder = inOrder(managmentController);
+		inOrder.verify(managmentController).remove(toRemove);
+		inOrder.verify(managmentController).findAllPurchasesOf(client);
+	}
+	
+	private LocalDateTime getCurrentDate() {
+		return LocalDateTime.of(
+						now().getYear(), 
+						now().getMonth(), 
+						now().getDayOfMonth(), 
+						now().getHour(), 
+						now().getHour());
+	}
+	
 }
+

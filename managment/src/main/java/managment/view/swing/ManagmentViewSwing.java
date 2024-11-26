@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import managment.controller.Managmentcontroller;
 import managment.model.Client;
 import managment.model.Purchase;
 import managment.view.ManagmentView;
@@ -19,12 +20,18 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
+
+import static java.time.LocalDateTime.now;
+
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ManagmentViewSwing extends JFrame implements ManagmentView{
+	
+	private transient Managmentcontroller managmentController;
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -42,6 +49,10 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	private DefaultListModel<Client> listClientsModel;
 	private DefaultListModel<Purchase> listPurchaseModel;
 		
+	public void setManagmentController(Managmentcontroller managmentController) {
+		this.managmentController = managmentController;
+	}
+
 	DefaultListModel<Client> getListClientsModel() {
 		return listClientsModel;
 	}
@@ -117,6 +128,9 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		txtPurchaseAmmount.setColumns(10);
 		
 		btnAddNewClient = new JButton("Add New Client");
+		btnAddNewClient.addActionListener(e ->
+			managmentController.add(new Client(txtClientName.getText()))
+			);
 		btnAddNewClient.setEnabled(false);
 		btnAddNewClient.setName("addNewClientButton");
 		GridBagConstraints gbc_btnAddNewClient = new GridBagConstraints();
@@ -127,6 +141,15 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(btnAddNewClient, gbc_btnAddNewClient);
 		
 		btnAddAmmount = new JButton("Add Ammount");
+		btnAddAmmount.addActionListener(e -> {
+			managmentController.addPurchaseToSelectedClient(
+					listClients.getSelectedValue(),
+					new Purchase(
+							getCurrentDate(),
+							Float.parseFloat(txtPurchaseAmmount.getText())
+							));
+			managmentController.findAllPurchasesOf(listClients.getSelectedValue());
+		});
 		btnAddAmmount.setEnabled(false);
 		btnAddAmmount.setName("AddAmmountButton");
 		GridBagConstraints gbc_btnAddAmmount = new GridBagConstraints();
@@ -140,9 +163,12 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		listClients = new JList<>(listClientsModel);
 
 		listClients.addListSelectionListener(e -> {
-			btnDeleteSelectedClientEnabler();
-			btnDeleteSelectedPurchaseEnabler();
-			btnAddAmmountEnabler();
+			if (!e.getValueIsAdjusting()) {	
+				managmentController.findAllPurchasesOf(listClients.getSelectedValue());
+				btnDeleteSelectedClientEnabler();
+				btnDeleteSelectedPurchaseEnabler();
+				btnAddAmmountEnabler();
+			}
 		});
 		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listClients.setName("clientList");
@@ -168,6 +194,9 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(listPurchases, gbc_listPurchases);
 		
 		btnDeleteSelectedClient = new JButton("Delete Selected Client");
+		btnDeleteSelectedClient.addActionListener(e -> 
+			managmentController.remove(listClients.getSelectedValue())
+				);
 		btnDeleteSelectedClient.setName("deleteSelectedClient");
 		btnDeleteSelectedClient.setEnabled(false);
 		GridBagConstraints gbc_btnDeleteSelectedClient = new GridBagConstraints();
@@ -178,6 +207,10 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(btnDeleteSelectedClient, gbc_btnDeleteSelectedClient);
 		
 		btnDeleteSelectedPurchase = new JButton("Delete Selected Purchase");
+		btnDeleteSelectedPurchase.addActionListener(e -> {
+			managmentController.remove(listPurchases.getSelectedValue());
+			managmentController.findAllPurchasesOf(listClients.getSelectedValue());
+		});
 		btnDeleteSelectedPurchase.setEnabled(false);
 		btnDeleteSelectedPurchase.setName("deleteSelectedPurchase");
 		GridBagConstraints gbc_btnDeleteSelectedPurchase = new GridBagConstraints();
@@ -268,6 +301,15 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	public void showPurchaseNotFoundError(String string, Purchase purchase) {
 		messageLable.setText(purchase.toString() + " not found");
 		
+	}
+	
+	private LocalDateTime getCurrentDate() {
+		return LocalDateTime.of(
+						now().getYear(), 
+						now().getMonth(), 
+						now().getDayOfMonth(), 
+						now().getHour(), 
+						now().getHour());
 	}
 
 }
