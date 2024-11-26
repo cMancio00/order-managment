@@ -1,6 +1,7 @@
 package managment.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -128,11 +129,14 @@ class PurchaseManagmentServiceTest {
 		@DisplayName("Add Client")
 		void testAddClient(){
 			Client client = new Client("testClient");
-			service.addClient(client);
+			when(clientRepository.save(eq(client), any())).thenReturn(new Client(1, "testClient"));
+			Client addedClient = service.addClient(client);
+			assertNotNull(addedClient);
 			verify(clientRepository).save(client, session);
 			verify(sessionFactory, times(1)).fromTransaction(any());
 			verifyNoMoreInteractions(clientRepository);
 			verifyNoInteractions(purchaseRepository);
+			assertThat(addedClient.getId()).isEqualTo(1);
 		}
 		
 		@Test
@@ -239,5 +243,6 @@ class PurchaseManagmentServiceTest {
 			assertThat(foundClient).isEmpty();
 		}
 	}
+	
 
 }

@@ -51,10 +51,9 @@ public class Managmentcontroller {
 
 	public void addPurchaseToSelectedClient(Client selectedClient, Purchase toAdd) {
 		Optional<Client> foundClient = service.findClientById(selectedClient.getId());
-		foundClient.ifPresentOrElse(client -> {
-			view.purchaseAdded(service.addPurchaseToClient(client, toAdd));
-		},
-				() -> handleClientNotFound(selectedClient));
+		foundClient.ifPresentOrElse(client -> 
+			view.purchaseAdded(service.addPurchaseToClient(client, toAdd)),
+			() -> handleClientNotFound(selectedClient));
 	}
 
 	private void handleClientNotFound(Client client) {

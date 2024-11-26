@@ -95,12 +95,14 @@ class ServiceRepositoryIT {
 	void addPurchaseToClient() {
 		Client clientNotToAddPurchase = new Client("clientNotToAddPurchase");
 		addTestClientToDatabase(clientNotToAddPurchase);
-		Client clientToAddPurchase = new Client("clientToAddPurchase");
-		addTestClientToDatabase(clientToAddPurchase);
+		Client clientToAddPurchase = sessionFactory.fromTransaction(session -> 
+				session.merge(new Client("clientToAddPurchase")));
 		Purchase purchaseToAdd = new Purchase(FIRST_TEST_DATE, 10.0);
 
-		Purchase addedPurchase = service.addPurchaseToClient(clientToAddPurchase, purchaseToAdd);
-		assertThat(findPurchasesOfClient(2)).containsExactly(addedPurchase);
+		service.addPurchaseToClient(clientToAddPurchase, purchaseToAdd);
+		assertThat(findPurchasesOfClient(2)).containsExactly(
+				new Purchase(1, FIRST_TEST_DATE, 10.0)
+				);
 	}
 
 	@Test

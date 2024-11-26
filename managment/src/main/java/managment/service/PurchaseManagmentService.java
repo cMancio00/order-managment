@@ -23,19 +23,20 @@ public class PurchaseManagmentService {
 	}
 
 	public Purchase addPurchaseToClient(Client client, Purchase purchase) {
-		purchase.setClient(client);
 		if(client.getPurchases() == null)
 			client.setPurchases(new ArrayList<>());
-		Purchase addedPurchase = sessionFactory.fromTransaction(session -> 
-				purchaseRepository.save(purchase, session));
-		client.getPurchases().add(addedPurchase);
-		return purchase;
+		return sessionFactory.fromTransaction(session ->{
+			Purchase addedPurchase = purchaseRepository.save(purchase, session);
+			addedPurchase.setClient(client);
+			client.getPurchases().add(addedPurchase);
+			return addedPurchase;
+		});
+
 		
 	}
 
 	public Client addClient(Client client) {
 		return sessionFactory.fromTransaction(session -> clientRepository.save(client, session));
-
 	}
 
 	public void deletePurchase(Purchase toDelete) {

@@ -141,7 +141,8 @@ class ControllerServiceIT {
 		addClientToDatabase(selectedClient);
 		Purchase toAdd = new Purchase(TEST_DATE, 5.0);
 		
-		controller.addPurchaseToSelectedClient(selectedClient, toAdd);
+		controller.addPurchaseToSelectedClient(
+				new Client(1, "selectedClient"), toAdd);
 		verify(view).purchaseAdded(new Purchase(1, TEST_DATE, 5.0));
 	}
 	
