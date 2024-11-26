@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Properties;
 
+import javax.swing.DefaultListModel;
+
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
@@ -91,7 +93,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		return view;
 		});
 		window = new FrameFixture(robot(), view);
-		window.show(); // shows the frame to test
+		window.show(); 
 	}
 	
 	@Test @GUITest
@@ -116,6 +118,16 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add New Client")).click();
 		assertThat(window.list("clientList").contents()).containsExactly(
 				new Client(1, "test").toString());
+	}
+	
+	@Test @GUITest
+	public void testDeleteClientButtonSuccess(){
+		GuiActionRunner.execute(() ->
+				controller.add(new Client("toDelete")));
+
+		window.list("clientList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
+		assertThat(window.list("clientList").contents()).isEmpty();
 	}
 
 }
