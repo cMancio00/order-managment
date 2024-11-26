@@ -58,11 +58,12 @@ class ManagmentControllerTest {
 		@Test
 		@DisplayName("Add client")
 		void testAddClient(){
-			Client toAdd = new Client(1, "toAdd");
+			Client toAdd = new Client("toAdd");
+			when(service.addClient(toAdd)).thenReturn(new Client(1, "toAdd"));
 			controller.add(toAdd);
 			InOrder inOrder = inOrder(service,view);
-			inOrder.verify(service).addClient(toAdd);
-			inOrder.verify(view).clientAdded(toAdd);
+			inOrder.verify(service).addClient(new Client("toAdd"));
+			inOrder.verify(view).clientAdded(new Client(1, "toAdd"));
 		}
 		
 		@Test
@@ -97,14 +98,15 @@ class ManagmentControllerTest {
 		@DisplayName("Add purchase to selected client when exists")
 		void testAddPurchaseToSelectedClientWhenExists(){
 			Client selectedClient = new Client(1, "selectedClient");
-			Purchase toAdd = new Purchase(1, TEST_DATE, 5.0);
+			Purchase toAdd = new Purchase(TEST_DATE, 5.0);
 			when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
-
+			when(service.addPurchaseToClient(selectedClient, toAdd))
+				.thenReturn(new Purchase(1, TEST_DATE, 5.0));
 			controller.addPurchaseToSelectedClient(selectedClient, toAdd);
 			InOrder inOrder = inOrder(service,view);
 			inOrder.verify(service).findClientById(1);
 			inOrder.verify(service).addPurchaseToClient(selectedClient, toAdd);
-			inOrder.verify(view).purchaseAdded(toAdd);
+			inOrder.verify(view).purchaseAdded(new Purchase(1, TEST_DATE, 5.0));
 		}
 		
 		@Test

@@ -47,9 +47,10 @@ class PurchaseRepositoryHibernateTest {
 		@DisplayName("Save when database is empty")
 		@Test
 		void testSave() {
-			sessionFactory.inTransaction(session -> 
-			purchaseRepository.save(new Purchase(FIRST_TEST_DATE, 10.0), session));
-			assertThat(readAllOrdersFromDatabase()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
+			Purchase toAdd = sessionFactory.fromTransaction(session -> 
+				purchaseRepository.save(new Purchase(FIRST_TEST_DATE, 10.0), session));
+			assertThat(readAllOrdersFromDatabase()).containsExactly(toAdd);
+			assertThat(toAdd.getId()).isEqualTo(1);
 		}
 		@DisplayName("Find by id when Purchase is preset")
 		@Test

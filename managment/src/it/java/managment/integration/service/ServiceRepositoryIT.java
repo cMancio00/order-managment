@@ -85,10 +85,9 @@ class ServiceRepositoryIT {
 		Client existingClient = new Client("existingClient");
 		addTestClientToDatabase(existingClient);
 		Client toAdd = new Client("toAdd");
-		service.addClient(toAdd);
+		toAdd = service.addClient(toAdd);
 		assertThat(readAllClientFromDatabase()).containsExactly(new Client(1, "existingClient"),
-				new Client(2, "toAdd"));
-
+				toAdd);
 	}
 
 	@Test
@@ -96,12 +95,14 @@ class ServiceRepositoryIT {
 	void addPurchaseToClient() {
 		Client clientNotToAddPurchase = new Client("clientNotToAddPurchase");
 		addTestClientToDatabase(clientNotToAddPurchase);
-		Client clientToAddPurchase = new Client("clientToAddPurchase");
-		addTestClientToDatabase(clientToAddPurchase);
+		Client clientToAddPurchase = sessionFactory.fromTransaction(session -> 
+				session.merge(new Client("clientToAddPurchase")));
 		Purchase purchaseToAdd = new Purchase(FIRST_TEST_DATE, 10.0);
 
 		service.addPurchaseToClient(clientToAddPurchase, purchaseToAdd);
-		assertThat(findPurchasesOfClient(2)).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
+		assertThat(findPurchasesOfClient(2)).containsExactly(
+				new Purchase(1, FIRST_TEST_DATE, 10.0)
+				);
 	}
 
 	@Test

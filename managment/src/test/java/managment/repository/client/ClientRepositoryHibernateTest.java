@@ -42,10 +42,12 @@ class ClientRepositoryHibernateTest {
 		@DisplayName("Save when database is empty")
 		@Test
 		void testSave() {
-			sessionFactory.inTransaction(session -> 
+			Client toAdd = sessionFactory.fromTransaction(session -> 
 			clientRepository.save(new Client("toAdd"), session));
-			assertThat(readAllClientFromDatabase()).containsExactly(new Client(1, "toAdd"));
+			assertThat(readAllClientFromDatabase()).containsExactly(toAdd);
+			assertThat(toAdd.getId()).isEqualTo(1);
 		}
+		
 		@DisplayName("Find by id when Client is preset")
 		@Test
 		void testFindByIdWhenIsPresent(){
