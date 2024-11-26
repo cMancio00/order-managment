@@ -25,8 +25,7 @@ public class Managmentcontroller {
 	}
 
 	public void add(Client toAdd) {
-		service.addClient(toAdd);
-		view.clientAdded(toAdd);
+		view.clientAdded(service.addClient(toAdd));
 	}
 
 	public void remove(Client toDelete) {
@@ -53,8 +52,7 @@ public class Managmentcontroller {
 	public void addPurchaseToSelectedClient(Client selectedClient, Purchase toAdd) {
 		Optional<Client> foundClient = service.findClientById(selectedClient.getId());
 		foundClient.ifPresentOrElse(client -> {
-			service.addPurchaseToClient(client, toAdd);
-			view.purchaseAdded(toAdd);
+			view.purchaseAdded(service.addPurchaseToClient(client, toAdd));
 		},
 				() -> handleClientNotFound(selectedClient));
 	}
