@@ -10,8 +10,8 @@ import managment.model.Purchase;
 public class PurchaseRepositoryHibernate implements PurchaseRepository{
 
 	@Override
-	public void save(Purchase order, Session session) {
-		session.merge(order);
+	public Purchase save(Purchase order, Session session) {
+		return session.merge(order);
 	}
 
 	@Override

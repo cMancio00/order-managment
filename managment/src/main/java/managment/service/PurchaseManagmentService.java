@@ -22,20 +22,21 @@ public class PurchaseManagmentService {
 		this.purchaseRepository = purchaseRepository;
 	}
 
-	public void addPurchaseToClient(Client client, Purchase purchase) {
-		purchase.setClient(client);
+	public Purchase addPurchaseToClient(Client client, Purchase purchase) {
 		if(client.getPurchases() == null)
 			client.setPurchases(new ArrayList<>());
-		client.getPurchases().add(purchase);
-		sessionFactory.inTransaction(session -> {
-			purchaseRepository.save(purchase, session);
-			clientRepository.save(client, session);
+		return sessionFactory.fromTransaction(session ->{
+			Purchase addedPurchase = purchaseRepository.save(purchase, session);
+			addedPurchase.setClient(client);
+			client.getPurchases().add(addedPurchase);
+			return addedPurchase;
 		});
+
+		
 	}
 
-	public void addClient(Client client) {
-		sessionFactory.inTransaction(session -> clientRepository.save(client, session));
-		
+	public Client addClient(Client client) {
+		return sessionFactory.fromTransaction(session -> clientRepository.save(client, session));
 	}
 
 	public void deletePurchase(Purchase toDelete) {

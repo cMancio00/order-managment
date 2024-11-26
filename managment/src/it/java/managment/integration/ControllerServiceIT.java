@@ -102,7 +102,7 @@ class ControllerServiceIT {
 	void testAddClient(){
 		Client toAdd = new Client("toAdd");
 		controller.add(toAdd);
-		verify(view).clientAdded(toAdd);
+		verify(view).clientAdded(new Client(1, "toAdd"));
 	}
 	
 	@Test
@@ -141,8 +141,9 @@ class ControllerServiceIT {
 		addClientToDatabase(selectedClient);
 		Purchase toAdd = new Purchase(TEST_DATE, 5.0);
 		
-		controller.addPurchaseToSelectedClient(selectedClient, toAdd);
-		verify(view).purchaseAdded(toAdd);
+		controller.addPurchaseToSelectedClient(
+				new Client(1, "selectedClient"), toAdd);
+		verify(view).purchaseAdded(new Purchase(1, TEST_DATE, 5.0));
 	}
 	
 	@Test

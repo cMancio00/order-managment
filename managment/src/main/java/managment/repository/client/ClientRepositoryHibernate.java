@@ -10,8 +10,8 @@ import managment.model.Client;
 public class ClientRepositoryHibernate implements ClientRepository {
 
 	@Override
-	public void save(Client client, Session session) {
-		session.merge(client);
+	public Client save(Client client, Session session) {
+		return session.merge(client);
 	}
 
 	@Override
