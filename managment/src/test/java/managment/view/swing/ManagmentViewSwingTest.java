@@ -185,7 +185,7 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testStudentRemovedShouldRemoveTheStudentFromTheListAndResetTheMessageLabel() {
+	public void testClientRemovedShouldRemoveTheClientFromTheListAndResetTheMessageLabel() {
 		Client toRemove = new Client(1, "toRemove");
 		Client client = new Client(2, "client");
 		GuiActionRunner.execute(() -> {
@@ -251,5 +251,20 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		window.textBox("clientNameBox").enterText("testClient");
 		window.button(JButtonMatcher.withText("Add New Client")).click();
 		verify(managmentController).add(new Client("testClient"));
+	}
+	
+	@Test
+	public void testDeleteClientShouldDelegateToManagmentControllerRemove(){
+		Client toRemove = new Client(1, "toRemove");
+		Client client = new Client(2, "client");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(toRemove);
+			listClientModel.addElement(client);
+		});
+
+		window.list("clientList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
+		verify(managmentController).remove(toRemove);
 	}
 }
