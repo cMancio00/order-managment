@@ -1,6 +1,7 @@
 package managment.integration.view;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.Properties;
 
@@ -130,4 +131,14 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		assertThat(window.list("clientList").contents()).isEmpty();
 	}
 
+	@Test @GUITest
+	public void testDeleteClientButtonError(){
+		Client notExisting = new Client(1, "notExisting");
+		GuiActionRunner.execute(
+				() -> view.getListClientsModel().addElement(notExisting));
+		window.list("clientList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
+		assertThat(window.list("clientList").contents()).containsExactly(notExisting.toString());
+		window.label("messageLable").requireText(notExisting.toString() + " not found");
+	}
 }

@@ -53,7 +53,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		this.managmentController = managmentController;
 	}
 
-	DefaultListModel<Client> getListClientsModel() {
+	public DefaultListModel<Client> getListClientsModel() {
 		return listClientsModel;
 	}
 	
