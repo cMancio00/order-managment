@@ -73,6 +73,7 @@ class ManagmentControllerTest {
 			controller.remove(toDelete);
 			InOrder inOrder = inOrder(service,view);
 			inOrder.verify(service).findClientById(1);
+			inOrder.verify(service).deleteClient(toDelete);
 			inOrder.verify(view).clientRemoved(toDelete);
 		}
 		
