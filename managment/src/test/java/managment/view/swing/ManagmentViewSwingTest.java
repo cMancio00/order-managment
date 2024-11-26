@@ -302,7 +302,7 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	}
 	
 	@Test
-	public void testDeleteSelectedPurchaseButtonShouldDelegateToManagmentControllerRemove() throws Exception {
+	public void testDeleteSelectedPurchaseButtonShouldDelegateToManagmentControllerRemove(){
 		Client client = new Client(1, "client");
 		GuiActionRunner.execute(() -> {
 			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();

@@ -31,7 +31,7 @@ import java.util.List;
 
 public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	
-	private Managmentcontroller managmentController;
+	private transient Managmentcontroller managmentController;
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
