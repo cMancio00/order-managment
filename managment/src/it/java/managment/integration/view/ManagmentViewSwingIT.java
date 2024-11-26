@@ -166,6 +166,21 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		
 	}
 	
+	@Test
+	public void testAddPurchaseButtonSuccess(){
+		service.addClient(new Client("testClient"));
+		GuiActionRunner.execute(
+				() -> controller.findAllClients());
+		
+		window.list("clientList").selectItem(0);
+		
+		window.textBox("purchaseAmmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		assertThat(window.list("purchaseList").contents()).containsExactly(
+				new Purchase(1, getCurrentDate(), 10.0).toString());
+		
+	}
+	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(
 						now().getYear(), 
