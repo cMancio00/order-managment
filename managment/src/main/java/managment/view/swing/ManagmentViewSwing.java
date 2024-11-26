@@ -150,9 +150,12 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		listClients = new JList<>(listClientsModel);
 
 		listClients.addListSelectionListener(e -> {
-			btnDeleteSelectedClientEnabler();
-			btnDeleteSelectedPurchaseEnabler();
-			btnAddAmmountEnabler();
+			if (!e.getValueIsAdjusting()) {	
+				managmentController.findAllPurchasesOf(listClients.getSelectedValue());
+				btnDeleteSelectedClientEnabler();
+				btnDeleteSelectedPurchaseEnabler();
+				btnAddAmmountEnabler();
+			}
 		});
 		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listClients.setName("clientList");

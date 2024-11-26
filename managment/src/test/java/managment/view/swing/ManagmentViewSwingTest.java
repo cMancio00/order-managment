@@ -267,4 +267,18 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
 		verify(managmentController).remove(toRemove);
 	}
+	
+	@Test
+	public void testSelectingClientShouldDelegateToManagmentControllerFindAllPurchasesOf(){
+		Client client = new Client(1, "client");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(client);
+		});
+
+		window.list("clientList").selectItem(0);
+		verify(managmentController).findAllPurchasesOf(client);
+	}
+	
 }
+
