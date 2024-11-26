@@ -26,12 +26,11 @@ public class PurchaseManagmentService {
 		purchase.setClient(client);
 		if(client.getPurchases() == null)
 			client.setPurchases(new ArrayList<>());
-		client.getPurchases().add(purchase);
-		return sessionFactory.fromTransaction(session -> {
-			Purchase addedPurchase = purchaseRepository.save(purchase, session);
-			clientRepository.save(client, session);
-			return addedPurchase;
-		});
+		Purchase addedPurchase = sessionFactory.fromTransaction(session -> 
+				purchaseRepository.save(purchase, session));
+		client.getPurchases().add(addedPurchase);
+		return purchase;
+		
 	}
 
 	public Client addClient(Client client) {

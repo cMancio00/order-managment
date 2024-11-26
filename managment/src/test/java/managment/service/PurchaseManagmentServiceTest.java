@@ -83,33 +83,46 @@ class PurchaseManagmentServiceTest {
 		@Test
 		@DisplayName("Add Purchase should respect relational constraints")
 		void testAddPurchaseShouldRespectRelationalConstraints() {
-			Client client = new Client("testClient");
-			Purchase existingPurchase = new Purchase(FIRST_TEST_DATE, 10.0);
+			Client client = new Client(1, "testClient");
+			Purchase existingPurchase = new Purchase(1, FIRST_TEST_DATE, 10.0);
+			existingPurchase.setClient(client);
 			Purchase purchase = new Purchase(SECOND_TEST_DATE, 5.0);
 			client.setPurchases(new ArrayList<Purchase>(asList(existingPurchase)));
 			
-			service.addPurchaseToClient(client, purchase);
-			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
-			inOrder.verify(purchaseRepository).save(eq(purchase), any());
-			inOrder.verify(clientRepository).save(eq(client), any());
+			when(purchaseRepository.save(eq(purchase), any()))
+				.thenReturn(new Purchase(2, SECOND_TEST_DATE, 5.0));
+			
+			Purchase addedPurchase = service.addPurchaseToClient(client, purchase);
+			verify(purchaseRepository).save(eq(purchase), any());
 			verify(sessionFactory, times(1)).fromTransaction(any());
-			assertThat(client.getPurchases()).containsExactly(existingPurchase,purchase);
-			assertThat(purchase.getClient()).isEqualTo(client);
+			
+			assertThat(client.getPurchases()).containsExactly(
+					existingPurchase,
+					new Purchase(2, SECOND_TEST_DATE, 5.0));
+			assertThat(addedPurchase.getClient()).isEqualTo(client);
 		}
 		
 		@Test
 		@DisplayName("Add Purchase on new Client should aslo create the list of purchases")
 		void testAddPurchaseOnNewClient() {
-			Client client = new Client("testClient");
+			Client client = new Client(1,"testClient");
 			Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
-			service.addPurchaseToClient(client, purchase);
-			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
-			inOrder.verify(purchaseRepository).save(eq(purchase), any());
-			inOrder.verify(clientRepository).save(eq(client), any());
+	
+			when(purchaseRepository.save(eq(purchase), any()))
+				.thenReturn(new Purchase(1, FIRST_TEST_DATE, 10.0));
+			
+			Purchase addedPurchase = service.addPurchaseToClient(client, purchase);
+			
+			verify(purchaseRepository)
+				.save(eq(purchase), any());
+
 			verify(sessionFactory, times(1)).fromTransaction(any());
-			assertThat(client.getPurchases()).containsExactly(purchase);
-			assertThat(purchase.getClient()).isEqualTo(client);
+			assertThat(client.getPurchases()).containsExactly(
+					new Purchase(1, FIRST_TEST_DATE, 10.0)
+					);
+			assertThat(addedPurchase.getClient().getId()).isEqualTo(1);
 		}
+		
 		
 		@Test
 		@DisplayName("Add Client")
