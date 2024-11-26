@@ -1,8 +1,10 @@
 package managment.integration.view;
 
+import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
+import java.time.LocalDateTime;
 import java.util.Properties;
 
 import javax.swing.DefaultListModel;
@@ -26,6 +28,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import managment.controller.Managmentcontroller;
 import managment.model.Client;
+import managment.model.Purchase;
 import managment.repository.client.ClientRepository;
 import managment.repository.client.ClientRepositoryHibernate;
 import managment.repository.purchase.PurchaseRepository;
@@ -140,5 +143,35 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
 		assertThat(window.list("clientList").contents()).containsExactly(notExisting.toString());
 		window.label("messageLable").requireText(notExisting.toString() + " not found");
+	}
+	
+	@Test @GUITest
+	public void testShowAllPurchaseOfASelectedClient(){
+		Client addedClient = service.addClient(new Client("testClient"));
+		Purchase aPurchase = service.addPurchaseToClient(
+				addedClient,
+				new Purchase(getCurrentDate(), 10.0));
+		Purchase anOtherPurchase = service.addPurchaseToClient(
+				addedClient,
+				new Purchase(getCurrentDate(), 5.0));
+		
+		GuiActionRunner.execute(
+				() -> controller.findAllClients());
+		
+		window.list("clientList").selectItem(0);
+		assertThat(window.list("purchaseList").contents()).containsExactly(
+				aPurchase.toString(),
+				anOtherPurchase.toString()
+				);
+		
+	}
+	
+	private LocalDateTime getCurrentDate() {
+		return LocalDateTime.of(
+						now().getYear(), 
+						now().getMonth(), 
+						now().getDayOfMonth(), 
+						now().getHour(), 
+						now().getHour());
 	}
 }
