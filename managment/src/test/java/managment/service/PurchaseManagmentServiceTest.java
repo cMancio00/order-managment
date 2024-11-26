@@ -92,7 +92,7 @@ class PurchaseManagmentServiceTest {
 			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
 			inOrder.verify(purchaseRepository).save(eq(purchase), any());
 			inOrder.verify(clientRepository).save(eq(client), any());
-			verify(sessionFactory, times(1)).inTransaction(any());
+			verify(sessionFactory, times(1)).fromTransaction(any());
 			assertThat(client.getPurchases()).containsExactly(existingPurchase,purchase);
 			assertThat(purchase.getClient()).isEqualTo(client);
 		}
@@ -106,7 +106,7 @@ class PurchaseManagmentServiceTest {
 			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
 			inOrder.verify(purchaseRepository).save(eq(purchase), any());
 			inOrder.verify(clientRepository).save(eq(client), any());
-			verify(sessionFactory, times(1)).inTransaction(any());
+			verify(sessionFactory, times(1)).fromTransaction(any());
 			assertThat(client.getPurchases()).containsExactly(purchase);
 			assertThat(purchase.getClient()).isEqualTo(client);
 		}
@@ -117,7 +117,7 @@ class PurchaseManagmentServiceTest {
 			Client client = new Client("testClient");
 			service.addClient(client);
 			verify(clientRepository).save(client, session);
-			verify(sessionFactory, times(1)).inTransaction(any());
+			verify(sessionFactory, times(1)).fromTransaction(any());
 			verifyNoMoreInteractions(clientRepository);
 			verifyNoInteractions(purchaseRepository);
 		}
