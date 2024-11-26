@@ -20,9 +20,13 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
+
+import static java.time.LocalDateTime.now;
+
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ManagmentViewSwing extends JFrame implements ManagmentView{
@@ -137,6 +141,15 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(btnAddNewClient, gbc_btnAddNewClient);
 		
 		btnAddAmmount = new JButton("Add Ammount");
+		btnAddAmmount.addActionListener(e -> {
+			managmentController.addPurchaseToSelectedClient(
+					listClients.getSelectedValue(),
+					new Purchase(
+							getCurrentDate(),
+							Float.parseFloat(txtPurchaseAmmount.getText())
+							));
+			managmentController.findAllPurchasesOf(listClients.getSelectedValue());
+		});
 		btnAddAmmount.setEnabled(false);
 		btnAddAmmount.setName("AddAmmountButton");
 		GridBagConstraints gbc_btnAddAmmount = new GridBagConstraints();
@@ -284,6 +297,15 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	public void showPurchaseNotFoundError(String string, Purchase purchase) {
 		messageLable.setText(purchase.toString() + " not found");
 		
+	}
+	
+	private LocalDateTime getCurrentDate() {
+		return LocalDateTime.of(
+						now().getYear(), 
+						now().getMonth(), 
+						now().getDayOfMonth(), 
+						now().getHour(), 
+						now().getHour());
 	}
 
 }

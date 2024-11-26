@@ -16,12 +16,15 @@ import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.inOrder;
+import static java.time.LocalDateTime.now;
 
 import managment.controller.Managmentcontroller;
 import managment.model.Client;
@@ -278,6 +281,33 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 
 		window.list("clientList").selectItem(0);
 		verify(managmentController).findAllPurchasesOf(client);
+	}
+	
+	@Test
+	public void testAddPurchaseShouldDelegateToManagmentControllerAddAndFindAllPurchaseOf(){
+		Client client = new Client(1, "client");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(client);
+		});
+
+		window.list("clientList").selectItem(0);
+		window.textBox("purchaseAmmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		InOrder inOrder = inOrder(managmentController);
+		
+		inOrder.verify(managmentController).addPurchaseToSelectedClient(client,
+				new Purchase(getCurrentDate(), 10.0));
+		inOrder.verify(managmentController).findAllPurchasesOf(client);
+	}
+	
+	private LocalDateTime getCurrentDate() {
+		return LocalDateTime.of(
+						now().getYear(), 
+						now().getMonth(), 
+						now().getDayOfMonth(), 
+						now().getHour(), 
+						now().getHour());
 	}
 	
 }
