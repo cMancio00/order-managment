@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import managment.controller.Managmentcontroller;
 import managment.model.Client;
 import managment.model.Purchase;
 import managment.view.ManagmentView;
@@ -25,6 +26,8 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class ManagmentViewSwing extends JFrame implements ManagmentView{
+	
+	private Managmentcontroller managmentController;
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -42,6 +45,10 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	private DefaultListModel<Client> listClientsModel;
 	private DefaultListModel<Purchase> listPurchaseModel;
 		
+	public void setManagmentController(Managmentcontroller managmentController) {
+		this.managmentController = managmentController;
+	}
+
 	DefaultListModel<Client> getListClientsModel() {
 		return listClientsModel;
 	}
@@ -117,6 +124,9 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		txtPurchaseAmmount.setColumns(10);
 		
 		btnAddNewClient = new JButton("Add New Client");
+		btnAddNewClient.addActionListener(e ->
+			managmentController.add(new Client(txtClientName.getText()))
+			);
 		btnAddNewClient.setEnabled(false);
 		btnAddNewClient.setName("addNewClientButton");
 		GridBagConstraints gbc_btnAddNewClient = new GridBagConstraints();

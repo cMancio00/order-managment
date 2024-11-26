@@ -16,10 +16,14 @@ import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 
+import managment.controller.Managmentcontroller;
 import managment.model.Client;
 import managment.model.Purchase;
 
@@ -28,20 +32,32 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 
 	private static final LocalDateTime TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
 
+	@Mock
+	private Managmentcontroller managmentController;
+	
 	private ManagmentViewSwing managmentViewSwing;
 
 	private FrameFixture window;
+	
+	private AutoCloseable closeable;
 
 	@Override
 	protected void onSetUp() {
+		closeable = MockitoAnnotations.openMocks(this);
 		GuiActionRunner.execute(() -> {
 			managmentViewSwing = new ManagmentViewSwing();
+			managmentViewSwing.setManagmentController(managmentController);
 			return managmentViewSwing;
 		});
 		window = new FrameFixture(robot(), managmentViewSwing);
 		window.show();
 	}
-
+	
+	@Override
+	protected void onTearDown() throws Exception {
+	closeable.close();
+	}
+	
 	@Test
 	@GUITest
 	public void testControlsInitialStates() {
@@ -228,5 +244,12 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		String[] listContents = window.list("purchaseList").contents();
 		assertThat(listContents).containsExactly(purchase.toString());
 		window.label("messageLable").requireText(" ");
+	}
+	
+	@Test
+	public void testAddNewClientShouldDelegateToManagmentControllerAdd(){
+		window.textBox("clientNameBox").enterText("testClient");
+		window.button(JButtonMatcher.withText("Add New Client")).click();
+		verify(managmentController).add(new Client("testClient"));
 	}
 }
