@@ -9,7 +9,7 @@ import managment.model.Client;
 
 public interface ClientRepository {
 
-	void save(Client client, Session session);
+	Client save(Client client, Session session);
 
 	Optional<Client> findById(int id, Session session);
 
