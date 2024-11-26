@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Properties;
 
+import org.assertj.swing.annotation.GUITest;
+import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.runner.GUITestRunner;
@@ -92,7 +94,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		window.show(); // shows the frame to test
 	}
 	
-	@Test
+	@Test @GUITest
 	public void testFindAllClients(){
 		Client firstClient = new Client("firstClient");
 		Client secondClient = new Client("secondClient");
@@ -106,6 +108,14 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 				new Client(1, "firstClient").toString(),
 				new Client(2, "secondClient").toString()
 				);
+	}
+	
+	@Test @GUITest
+	public void testAddClientButtonSuccess(){
+		window.textBox("clientNameBox").enterText("test");
+		window.button(JButtonMatcher.withText("Add New Client")).click();
+		assertThat(window.list("clientList").contents()).containsExactly(
+				new Client(1, "test").toString());
 	}
 
 }
