@@ -9,7 +9,7 @@ import managment.model.Purchase;
 
 public interface PurchaseRepository {
 
-	void save(Purchase order, Session session);
+	Purchase save(Purchase order, Session session);
 
 	Optional<Purchase> findById(int id, Session session);
 
