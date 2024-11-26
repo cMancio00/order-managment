@@ -207,6 +207,10 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(btnDeleteSelectedClient, gbc_btnDeleteSelectedClient);
 		
 		btnDeleteSelectedPurchase = new JButton("Delete Selected Purchase");
+		btnDeleteSelectedPurchase.addActionListener(e -> {
+			managmentController.remove(listPurchases.getSelectedValue());
+			managmentController.findAllPurchasesOf(listClients.getSelectedValue());
+		});
 		btnDeleteSelectedPurchase.setEnabled(false);
 		btnDeleteSelectedPurchase.setName("deleteSelectedPurchase");
 		GridBagConstraints gbc_btnDeleteSelectedPurchase = new GridBagConstraints();

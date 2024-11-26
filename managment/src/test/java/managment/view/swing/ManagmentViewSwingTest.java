@@ -301,6 +301,26 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		inOrder.verify(managmentController).findAllPurchasesOf(client);
 	}
 	
+	@Test
+	public void testDeleteSelectedPurchaseButtonShouldDelegateToManagmentControllerRemove() throws Exception {
+		Client client = new Client(1, "client");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientModel = managmentViewSwing.getListClientsModel();
+			listClientModel.addElement(client);
+		});
+		window.list("clientList").selectItem(0);
+		Purchase toRemove = new Purchase(1, getCurrentDate(), 10.0);
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Purchase> listPurchaseModel = managmentViewSwing.getListPurchaseModel();
+			listPurchaseModel.addElement(toRemove);
+		});
+		window.list("purchaseList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
+		InOrder inOrder = inOrder(managmentController);
+		inOrder.verify(managmentController).remove(toRemove);
+		inOrder.verify(managmentController).findAllPurchasesOf(client);
+	}
+	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(
 						now().getYear(), 
