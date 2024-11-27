@@ -14,53 +14,65 @@ import managment.repository.purchase.PurchaseRepository;
 import managment.repository.purchase.PurchaseRepositoryHibernate;
 import managment.service.PurchaseManagmentService;
 import managment.view.swing.ManagmentViewSwing;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 @Command(mixinStandardHelpOptions = true)
 public class ManagmentSwingApp implements Callable<Void> {
 
-	private static SessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
+
+	@Option(names = { "--mysql-host" }, description = "mySQL host address")
+	private String mysqlHost = "localhost";
+
+	@Option(names = { "--mysql-port" }, description = "mySQL host port")
+	private int mysqlPort = 3306;
+
+	@Option(names = { "--db-name" }, description = "Database name")
+	private String databaseName = "managment";
+
+	@Option(names = { "--username" }, description = "Username for database access")
+	private String username = "order-manager";
+
+	@Option(names = { "--password" }, description = "Password for database access")
+	private String password = "mysecret";
 	
-@Override
-	public Void call() throws Exception {
-		return null;
+	private String url = String.format("jdbc:mysql://%s:%s/%s", mysqlHost, mysqlPort, databaseName);
+	
+	public static void main(String[] args) {
+		new CommandLine(new ManagmentSwingApp()).execute(args);
 	}
 
-	public static void main(String[] args) {
+	@Override
+	public Void call() throws Exception {
 		EventQueue.invokeLater(() -> {
 			try {
-				String mysqlHost = "localhost";
-				int mysqlPort = 3306;
-				if (args.length > 0)
-					mysqlHost = args[0];
-				if (args.length > 1)
-					mysqlPort = Integer.parseInt(args[1]);
-				
 				Properties mysqlProperties = new Properties();
-				mysqlProperties.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/managment");
-				mysqlProperties.setProperty("hibernate.connection.username", "order-manager");
-				mysqlProperties.setProperty("hibernate.connection.password", "mysecret");
-				sessionFactory = new Configuration().setProperties(mysqlProperties).configure()
-						.buildSessionFactory();
+				mysqlProperties.setProperty("hibernate.connection.url", url);
+				mysqlProperties.setProperty("hibernate.connection.username", username);
+				mysqlProperties.setProperty("hibernate.connection.password", password);
+				sessionFactory = new Configuration().setProperties(mysqlProperties).configure().buildSessionFactory();
 				
 				PurchaseRepository purchaseRepository = new PurchaseRepositoryHibernate();
 				ClientRepository clientRepository = new ClientRepositoryHibernate();
-				
-				PurchaseManagmentService service = 
-						new PurchaseManagmentService(sessionFactory, clientRepository, purchaseRepository);
+
+				PurchaseManagmentService service = new PurchaseManagmentService(sessionFactory, clientRepository,
+						purchaseRepository);
 				ManagmentViewSwing view = new ManagmentViewSwing();
-				
+
 				Managmentcontroller controller = new Managmentcontroller(view, service);
 				view.setManagmentController(controller);
-				
+
 				view.setVisible(true);
 				controller.findAllClients();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
 		});
+		return null;
 	}
-	
+
+
 }
-
-
