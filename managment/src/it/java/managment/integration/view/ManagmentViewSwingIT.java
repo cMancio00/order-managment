@@ -1,13 +1,12 @@
 package managment.integration.view;
 
 import static java.time.LocalDateTime.now;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.*;
+
 
 import java.time.LocalDateTime;
 import java.util.Properties;
 
-import javax.swing.DefaultListModel;
 
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.matcher.JButtonMatcher;
@@ -180,6 +179,25 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 				new Purchase(1, getCurrentDate(), 10.0).toString());
 		
 	}
+	
+	@Test @GUITest
+	public void testDeletePurchaseButtonSuccess(){
+		Client addedClient = service.addClient(new Client("testClient"));
+		service.addPurchaseToClient(
+				addedClient,
+				new Purchase(getCurrentDate(), 10.0));
+		
+		GuiActionRunner.execute(
+				() -> controller.findAllClients());
+		
+		window.list("clientList").selectItem(0);
+		window.list("purchaseList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
+		assertThat(window.list("purchaseList").contents()).isEmpty();
+
+	}
+	
+
 	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(
