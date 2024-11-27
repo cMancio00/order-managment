@@ -63,6 +63,7 @@
 		<mysql.version>9.1.0</mysql.version>
 		<testcontainers.version>1.20.3</testcontainers.version>
 		<assertj-swing.version>3.17.1</assertj-swing.version>
+		<picocli.version>4.6.1</picocli.version>
 
 	</properties>
 
@@ -144,6 +145,12 @@
 			<artifactId>assertj-swing-junit</artifactId>
 			<version>${assertj-swing.version}</version>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>${picocli.version}</version>
 		</dependency>
 
 
