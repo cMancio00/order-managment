@@ -18,6 +18,11 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+/*
+ * Start App from Maven with:
+ * 
+ * mvn exec:java -Dexec.mainClass="managment.app.ManagmentSwingApp"
+*/
 @Command(mixinStandardHelpOptions = true)
 public class ManagmentSwingApp implements Callable<Void> {
 
