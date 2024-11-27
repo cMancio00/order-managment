@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -25,6 +27,7 @@ import picocli.CommandLine.Option;
 */
 @Command(mixinStandardHelpOptions = true)
 public class ManagmentSwingApp implements Callable<Void> {
+	private static final Logger LOGGER = LogManager.getLogger(ManagmentSwingApp.class);
 
 	private SessionFactory sessionFactory;
 
@@ -41,11 +44,12 @@ public class ManagmentSwingApp implements Callable<Void> {
 	private String username = "order-manager";
 
 	@Option(names = { "--password" }, description = "Password for database access")
-	private String password = "mysecret";
+	private String password = System.getenv("MYSQL_PASSWORD");
 	
 	private String url = String.format("jdbc:mysql://%s:%s/%s", mysqlHost, mysqlPort, databaseName);
 	
 	public static void main(String[] args) {
+		LOGGER.info("Starting the order managment application...");
 		new CommandLine(new ManagmentSwingApp()).execute(args);
 	}
 
@@ -73,7 +77,7 @@ public class ManagmentSwingApp implements Callable<Void> {
 				controller.findAllClients();
 				
 			}catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("Exception",e);
 			}
 		});
 		return null;
