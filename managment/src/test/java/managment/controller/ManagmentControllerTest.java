@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,6 +93,20 @@ class ManagmentControllerTest {
 			inOrder.verify(service).findClientById(1);
 			inOrder.verify(service).findallPurchases(selectedClient);
 			inOrder.verify(view).showAllPurchases(purchases);
+		}
+		
+		@Test
+		@DisplayName("Find all purchase of an existing selected client whith no purchase ")
+		void findAllPurchaseOfSelectedClientWhenNoPurchaseShouldReturnEmptyList(){
+			Client selectedClient = new Client(1, "selectedClient");
+
+			when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
+			when(service.findallPurchases(selectedClient)).thenReturn(null);
+			controller.findAllPurchasesOf(selectedClient);
+			InOrder inOrder = inOrder(service,view);
+			inOrder.verify(service).findClientById(1);
+			inOrder.verify(service).findallPurchases(selectedClient);
+			inOrder.verify(view).showAllPurchases(Collections.emptyList());
 		}
 		
 		@Test
