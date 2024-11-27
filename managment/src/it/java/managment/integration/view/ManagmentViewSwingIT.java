@@ -60,9 +60,6 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		mysqlProperties.setProperty("hibernate.connection.url", mysql.getJdbcUrl());
 		mysqlProperties.setProperty("hibernate.connection.username", mysql.getUsername());
 		mysqlProperties.setProperty("hibernate.connection.password", mysql.getPassword());
-		System.setProperty("hibernate.connection.url", mysql.getJdbcUrl());
-		System.setProperty("hibernate.connection.username", mysql.getUsername());
-		System.setProperty("hibernate.connection.password", mysql.getPassword());
 		sessionFactory = new Configuration().setProperties(mysqlProperties).configure("hibernate-integration.cfg.xml")
 				.buildSessionFactory();
 	}
