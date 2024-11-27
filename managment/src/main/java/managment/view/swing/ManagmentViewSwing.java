@@ -206,10 +206,8 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(btnDeleteSelectedClient, gbc_btnDeleteSelectedClient);
 		
 		btnDeleteSelectedPurchase = new JButton("Delete Selected Purchase");
-		btnDeleteSelectedPurchase.addActionListener(e -> {
-			managmentController.remove(listPurchases.getSelectedValue());
-			managmentController.findAllPurchasesOf(listClients.getSelectedValue());
-		});
+		btnDeleteSelectedPurchase.addActionListener(e ->
+			managmentController.remove(listPurchases.getSelectedValue()));
 		btnDeleteSelectedPurchase.setEnabled(false);
 		btnDeleteSelectedPurchase.setName("deleteSelectedPurchase");
 		GridBagConstraints gbc_btnDeleteSelectedPurchase = new GridBagConstraints();
@@ -255,6 +253,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	@Override
 	public void showAllClients(List<Client> clients) {
+		listClientsModel.clear();
 		clients.stream().forEach(listClientsModel::addElement);
 	}
 
@@ -276,6 +275,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	@Override
 	public void showAllPurchases(List<Purchase> purchases) {
+		listPurchaseModel.clear();
 		purchases.stream().forEach(listPurchaseModel::addElement);
 	}
 

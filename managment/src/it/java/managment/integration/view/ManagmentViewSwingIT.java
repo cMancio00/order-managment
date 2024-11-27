@@ -60,9 +60,6 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		mysqlProperties.setProperty("hibernate.connection.url", mysql.getJdbcUrl());
 		mysqlProperties.setProperty("hibernate.connection.username", mysql.getUsername());
 		mysqlProperties.setProperty("hibernate.connection.password", mysql.getPassword());
-		System.setProperty("hibernate.connection.url", mysql.getJdbcUrl());
-		System.setProperty("hibernate.connection.username", mysql.getUsername());
-		System.setProperty("hibernate.connection.password", mysql.getPassword());
 		sessionFactory = new Configuration().setProperties(mysqlProperties).configure("hibernate-integration.cfg.xml")
 				.buildSessionFactory();
 	}
@@ -131,6 +128,28 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
 		assertThat(window.list("clientList").contents()).isEmpty();
 	}
+	
+	@Test @GUITest
+	public void testDeleteClientButtonShouldAlsoResetTheClientAndPurchaseList(){
+		Client addedClient = service.addClient(new Client("testClient"));
+		Client anOtherClient = service.addClient(new Client("anOtherClient"));
+		service.addPurchaseToClient(
+				addedClient,
+				new Purchase(getCurrentDate(), 10.0));
+		service.addPurchaseToClient(
+				addedClient,
+				new Purchase(getCurrentDate(), 5.0));
+		
+		GuiActionRunner.execute(
+				() -> controller.findAllClients());
+		
+		window.list("clientList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
+
+		assertThat(window.list("clientList").contents()).containsExactly(anOtherClient.toString());
+		window.list("clientList").selectItem(0);
+		assertThat(window.list("purchaseList").contents()).isEmpty();
+	}
 
 	@Test @GUITest
 	public void testDeleteClientButtonError(){
@@ -146,6 +165,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 	@Test @GUITest
 	public void testShowAllPurchaseOfASelectedClient(){
 		Client addedClient = service.addClient(new Client("testClient"));
+		service.addClient(new Client("anOtherClient"));
 		Purchase aPurchase = service.addPurchaseToClient(
 				addedClient,
 				new Purchase(getCurrentDate(), 10.0));
@@ -162,6 +182,12 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 				anOtherPurchase.toString()
 				);
 		
+		window.list("clientList").selectItem(1);
+		window.list("clientList").selectItem(0);
+		assertThat(window.list("purchaseList").contents()).containsExactly(
+				aPurchase.toString(),
+				anOtherPurchase.toString()
+				);
 	}
 	
 	@Test @GUITest
@@ -213,6 +239,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		window.label("messageLable").requireText(notExisting.toString() + " not found");
 	}
 
+	
 	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(
