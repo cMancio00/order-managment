@@ -44,7 +44,7 @@ public class ManagmentSwingApp implements Callable<Void> {
 	private String username = "order-manager";
 
 	@Option(names = { "--password" }, description = "Password for database access")
-	private String password = System.getenv("MYSQL_PASSWORD");
+	private String password = "mysecret";
 	
 	private String url = String.format("jdbc:mysql://%s:%s/%s", mysqlHost, mysqlPort, databaseName);
 	

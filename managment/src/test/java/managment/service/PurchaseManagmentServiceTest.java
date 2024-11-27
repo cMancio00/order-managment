@@ -1,10 +1,11 @@
 package managment.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -159,21 +160,33 @@ class PurchaseManagmentServiceTest {
 		}
 		
 		@Test
+		@DisplayName("Delete a non existing Client should do nothing")
+		void testDeleteNonExistingClient() {
+			when(clientRepository.findById(eq(1), any())).thenReturn(Optional.empty());
+			
+			service.deleteClient(new Client(1,"notExisting"));
+			verify(sessionFactory, times(1)).inTransaction(any());
+			verifyNoMoreInteractions(ignoreStubs(clientRepository));
+			verifyNoInteractions(purchaseRepository);
+		}
+		
+		@Test
 		@DisplayName("Delete Client should also delete all its purchases")
 		void testDeleteClient(){
-			Client client = new Client(1,"testClient");
-			Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
-			purchase.setClient(client);
-			Purchase toDelete = new Purchase(2,SECOND_TEST_DATE, 5.0);
-			toDelete.setClient(client);
-			client.setPurchases(new ArrayList<Purchase>(Arrays.asList(purchase,toDelete)));
+			Optional<Client> client = Optional.of(new Client(1,"testClient"));
+			Purchase toDelete = new Purchase(1,SECOND_TEST_DATE, 5.0);
+			toDelete.setClient(client.get());
+			client.get().setPurchases(new ArrayList<Purchase>(Arrays.asList(toDelete)));
 			
-			service.deleteClient(client);
+			when(clientRepository.findById(eq(1), any())).thenReturn(client);
+			
+			service.deleteClient(client.get());
 			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
-			inOrder.verify(purchaseRepository, times(2)).delete(any(Purchase.class), any());
-			inOrder.verify(clientRepository).delete(eq(client), any());
+			inOrder.verify(clientRepository).findById(eq(1), any());
+			inOrder.verify(purchaseRepository, times(1)).delete(any(Purchase.class), any());
+			inOrder.verify(clientRepository).delete(eq(client.get()), any());
 			verify(sessionFactory, times(1)).inTransaction(any());
-			verifyNoMoreInteractions(clientRepository);
+			verifyNoMoreInteractions(ignoreStubs(clientRepository));
 			verifyNoMoreInteractions(purchaseRepository);
 		}
 		
