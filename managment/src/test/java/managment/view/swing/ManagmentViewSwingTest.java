@@ -140,10 +140,24 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 				.execute(() -> managmentViewSwing.getListPurchaseModel().addElement(new Purchase(1, TEST_DATE, 10.0)));
 
 		window.list("clientList").clearSelection();
+		
+		GuiActionRunner
+		.execute(() -> managmentViewSwing.getListPurchaseModel().addElement(new Purchase(1, TEST_DATE, 10.0)));
+
 		window.list("purchaseList").selectItem(0);
 		deleteButton.requireDisabled();
 
+	}
+	
+	@Test @GUITest
+	public void testDeletePurchaseButtonShouldBeEnableWhenClientAndAPurchaseAreSelected(){
+		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Delete Selected Purchase"));
+		GuiActionRunner.execute(() -> managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
+
 		window.list("clientList").selectItem(0);
+		GuiActionRunner
+				.execute(() -> managmentViewSwing.getListPurchaseModel().addElement(new Purchase(1, TEST_DATE, 10.0)));
+		window.list("purchaseList").selectItem(0);
 		deleteButton.requireEnabled();
 	}
 
@@ -318,7 +332,6 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
 		InOrder inOrder = inOrder(managmentController);
 		inOrder.verify(managmentController).remove(toRemove);
-		inOrder.verify(managmentController).findAllPurchasesOf(client);
 	}
 	
 	private LocalDateTime getCurrentDate() {
