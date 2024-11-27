@@ -98,7 +98,7 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 		});
 		window = new FrameFixture(robot(), view);
 		window.show();
-		
+
 	}
 
 	@Test
@@ -108,28 +108,51 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add New Client")).click();
 		assertThat(window.list("clientList").contents()).anySatisfy(e -> assertThat(e).contains("newClient"));
 	}
-	
+
 	@Test
 	@GUITest
-	public void testDeleteButtonSuccess() {
-		window.list("clientList")
-		.selectItem(Pattern.compile(".*" + "aClient" + ".*"));
+	public void testDeleteClientButtonSuccess() {
+		window.list("clientList").selectItem(Pattern.compile(".*" + "aClient" + ".*"));
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
-		assertThat(window.list("clientList").contents())
-		.noneMatch(e -> e.contains("aClient"));
+		assertThat(window.list("clientList").contents()).noneMatch(e -> e.contains("aClient"));
 	}
-	
+
 	@Test
 	@GUITest
-	public void testDeleteButtonError() {
-		window.list("clientList")
-		.selectItem(Pattern.compile(".*" + "otherClient" + ".*"));
+	public void testDeleteClientButtonError() {
+		window.list("clientList").selectItem(Pattern.compile(".*" + "otherClient" + ".*"));
 		GuiActionRunner.execute(() -> service.deleteClient(new Client(2, "otherClient")));
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
-		assertThat(window.label("messageLable").text())
-		.contains("otherClient", "not found");
+		assertThat(window.label("messageLable").text()).contains("otherClient", "not found");
+	}
+
+	@Test
+	@GUITest
+	public void testAddPurchaseSuccess() {
+		window.list("clientList").selectItem(Pattern.compile(".*" + "otherClient" + ".*"));
+		window.textBox("purchaseAmmountBox").enterText("15.0");
+		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		assertThat(window.list("purchaseList").contents()).anySatisfy(e -> assertThat(e).contains("15.0"));
 	}
 	
+	@Test
+	@GUITest
+	public void testDeletePurchaseButtonSuccess() {
+		window.list("clientList").selectItem(Pattern.compile(".*" + "aClient" + ".*"));
+		window.list("purchaseList").selectItem(Pattern.compile(".*" + "10.0" + ".*"));
+		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
+		assertThat(window.list("purchaseList").contents()).noneMatch(e -> e.contains("10.0"));
+	}
+	
+	@Test
+	@GUITest
+	public void testDeletePurchaseButtonError() {
+		window.list("clientList").selectItem(Pattern.compile(".*" + "aClient" + ".*"));
+		window.list("purchaseList").selectItem(Pattern.compile(".*" + "10.0" + ".*"));
+		GuiActionRunner.execute(() -> service.deletePurchase(view.getListPurchaseModel().getElementAt(0)));
+		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
+		assertThat(window.label("messageLable").text()).contains("10.0", "not found");
+	}
 	
 
 	private LocalDateTime getCurrentDate() {
