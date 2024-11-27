@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
-
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
@@ -41,8 +40,9 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 
 	@ClassRule
 	@SuppressWarnings({ "rawtypes", "resource" })
-	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
-			.withDatabaseName("ViewIT-db").withUsername("manager").withPassword("it").withReuse(true);
+	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(
+			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("ViewIT-db").withUsername("manager")
+			.withPassword("it").withReuse(true);
 
 	private static SessionFactory sessionFactory;
 	private ClientRepository clientRepository;
@@ -52,7 +52,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 	private ManagmentViewSwing view;
 
 	private FrameFixture window;
-	
+
 	@BeforeClass
 	public static void setupServer() {
 		mysql.start();
@@ -63,7 +63,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		sessionFactory = new Configuration().setProperties(mysqlProperties).configure("hibernate-integration.cfg.xml")
 				.buildSessionFactory();
 	}
-	
+
 	@Before
 	public void setup() {
 		sessionFactory.getCache().evictAllRegions();
@@ -71,78 +71,71 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		purchaseRepository = new PurchaseRepositoryHibernate();
 		service = new PurchaseManagmentService(sessionFactory, clientRepository, purchaseRepository);
 	}
-	
+
 	@After
 	public void truncateSchema() {
 		sessionFactory.getSchemaManager().truncateMappedObjects();
 	}
-	
+
 	@Override
 	protected void onSetUp() throws Exception {
 		sessionFactory.getCache().evictAllRegions();
 		clientRepository = new ClientRepositoryHibernate();
 		purchaseRepository = new PurchaseRepositoryHibernate();
 		service = new PurchaseManagmentService(sessionFactory, clientRepository, purchaseRepository);
-		
+
 		GuiActionRunner.execute(() -> {
-		view = new ManagmentViewSwing();
-		controller =
-		new Managmentcontroller(view, service);
-		view.setManagmentController(controller);
-		return view;
+			view = new ManagmentViewSwing();
+			controller = new Managmentcontroller(view, service);
+			view.setManagmentController(controller);
+			return view;
 		});
 		window = new FrameFixture(robot(), view);
-		window.show(); 
+		window.show();
 	}
-	
-	@Test @GUITest
-	public void testFindAllClients(){
+
+	@Test
+	@GUITest
+	public void testFindAllClients() {
 		Client firstClient = new Client("firstClient");
 		Client secondClient = new Client("secondClient");
 		service.addClient(firstClient);
 		service.addClient(secondClient);
-		
-		GuiActionRunner.execute(
-				() -> controller.findAllClients());
-		
-		assertThat(window.list("clientList").contents()).containsExactly(
-				new Client(1, "firstClient").toString(),
-				new Client(2, "secondClient").toString()
-				);
+
+		GuiActionRunner.execute(() -> controller.findAllClients());
+
+		assertThat(window.list("clientList").contents()).containsExactly(new Client(1, "firstClient").toString(),
+				new Client(2, "secondClient").toString());
 	}
-	
-	@Test @GUITest
-	public void testAddClientButtonSuccess(){
+
+	@Test
+	@GUITest
+	public void testAddClientButtonSuccess() {
 		window.textBox("clientNameBox").enterText("test");
 		window.button(JButtonMatcher.withText("Add New Client")).click();
-		assertThat(window.list("clientList").contents()).containsExactly(
-				new Client(1, "test").toString());
+		assertThat(window.list("clientList").contents()).containsExactly(new Client(1, "test").toString());
 	}
-	
-	@Test @GUITest
-	public void testDeleteClientButtonSuccess(){
-		GuiActionRunner.execute(() ->
-				controller.add(new Client("toDelete")));
+
+	@Test
+	@GUITest
+	public void testDeleteClientButtonSuccess() {
+		GuiActionRunner.execute(() -> controller.add(new Client("toDelete")));
 
 		window.list("clientList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
 		assertThat(window.list("clientList").contents()).isEmpty();
 	}
-	
-	@Test @GUITest
-	public void testDeleteClientButtonShouldAlsoResetTheClientAndPurchaseList(){
+
+	@Test
+	@GUITest
+	public void testDeleteClientButtonShouldAlsoResetTheClientAndPurchaseList() {
 		Client addedClient = service.addClient(new Client("testClient"));
 		Client anOtherClient = service.addClient(new Client("anOtherClient"));
-		service.addPurchaseToClient(
-				addedClient,
-				new Purchase(getCurrentDate(), 10.0));
-		service.addPurchaseToClient(
-				addedClient,
-				new Purchase(getCurrentDate(), 5.0));
-		
-		GuiActionRunner.execute(
-				() -> controller.findAllClients());
-		
+		service.addPurchaseToClient(addedClient, new Purchase(getCurrentDate(), 10.0));
+		service.addPurchaseToClient(addedClient, new Purchase(getCurrentDate(), 5.0));
+
+		GuiActionRunner.execute(() -> controller.findAllClients());
+
 		window.list("clientList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
 
@@ -151,102 +144,85 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		assertThat(window.list("purchaseList").contents()).isEmpty();
 	}
 
-	@Test @GUITest
-	public void testDeleteClientButtonError(){
+	@Test
+	@GUITest
+	public void testDeleteClientButtonError() {
 		Client notExisting = new Client(1, "notExisting");
-		GuiActionRunner.execute(
-				() -> view.getListClientsModel().addElement(notExisting));
+		GuiActionRunner.execute(() -> view.getListClientsModel().addElement(notExisting));
 		window.list("clientList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
 		assertThat(window.list("clientList").contents()).containsExactly(notExisting.toString());
 		window.label("messageLable").requireText(notExisting.toString() + " not found");
 	}
-	
-	@Test @GUITest
-	public void testShowAllPurchaseOfASelectedClient(){
+
+	@Test
+	@GUITest
+	public void testShowAllPurchaseOfASelectedClient() {
 		Client addedClient = service.addClient(new Client("testClient"));
 		service.addClient(new Client("anOtherClient"));
-		Purchase aPurchase = service.addPurchaseToClient(
-				addedClient,
-				new Purchase(getCurrentDate(), 10.0));
-		Purchase anOtherPurchase = service.addPurchaseToClient(
-				addedClient,
-				new Purchase(getCurrentDate(), 5.0));
-		
-		GuiActionRunner.execute(
-				() -> controller.findAllClients());
-		
+		Purchase aPurchase = service.addPurchaseToClient(addedClient, new Purchase(getCurrentDate(), 10.0));
+		Purchase anOtherPurchase = service.addPurchaseToClient(addedClient, new Purchase(getCurrentDate(), 5.0));
+
+		GuiActionRunner.execute(() -> controller.findAllClients());
+
 		window.list("clientList").selectItem(0);
-		assertThat(window.list("purchaseList").contents()).containsExactly(
-				aPurchase.toString(),
-				anOtherPurchase.toString()
-				);
-		
+		assertThat(window.list("purchaseList").contents()).containsExactly(aPurchase.toString(),
+				anOtherPurchase.toString());
+
 		window.list("clientList").selectItem(1);
 		window.list("clientList").selectItem(0);
-		assertThat(window.list("purchaseList").contents()).containsExactly(
-				aPurchase.toString(),
-				anOtherPurchase.toString()
-				);
+		assertThat(window.list("purchaseList").contents()).containsExactly(aPurchase.toString(),
+				anOtherPurchase.toString());
 	}
-	
-	@Test @GUITest
-	public void testAddPurchaseButtonSuccess(){
+
+	@Test
+	@GUITest
+	public void testAddPurchaseButtonSuccess() {
 		service.addClient(new Client("testClient"));
-		GuiActionRunner.execute(
-				() -> controller.findAllClients());
-		
+		GuiActionRunner.execute(() -> controller.findAllClients());
+
 		window.list("clientList").selectItem(0);
-		
+
 		window.textBox("purchaseAmmountBox").enterText("10.0");
 		window.button(JButtonMatcher.withText("Add Ammount")).click();
-		assertThat(window.list("purchaseList").contents()).containsExactly(
-				new Purchase(1, getCurrentDate(), 10.0).toString());
-		
+		assertThat(window.list("purchaseList").contents())
+				.containsExactly(new Purchase(1, getCurrentDate(), 10.0).toString());
+
 	}
-	
-	@Test @GUITest
-	public void testDeletePurchaseButtonSuccess(){
+
+	@Test
+	@GUITest
+	public void testDeletePurchaseButtonSuccess() {
 		Client addedClient = service.addClient(new Client("testClient"));
-		service.addPurchaseToClient(
-				addedClient,
-				new Purchase(getCurrentDate(), 10.0));
-		
-		GuiActionRunner.execute(
-				() -> controller.findAllClients());
-		
+		service.addPurchaseToClient(addedClient, new Purchase(getCurrentDate(), 10.0));
+
+		GuiActionRunner.execute(() -> controller.findAllClients());
+
 		window.list("clientList").selectItem(0);
 		window.list("purchaseList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
 		assertThat(window.list("purchaseList").contents()).isEmpty();
 
 	}
-	
-	@Test @GUITest
-	public void testDeletePurchaseButtonError(){
+
+	@Test
+	@GUITest
+	public void testDeletePurchaseButtonError() {
 		service.addClient(new Client("testClient"));
-		
-		GuiActionRunner.execute(
-				() -> controller.findAllClients());
+
+		GuiActionRunner.execute(() -> controller.findAllClients());
 		window.list("clientList").selectItem(0);
-		
-		Purchase notExisting = new Purchase(2,getCurrentDate(),5.0);
-		GuiActionRunner.execute(() -> 
-				view.getListPurchaseModel().addElement(notExisting));
+
+		Purchase notExisting = new Purchase(2, getCurrentDate(), 5.0);
+		GuiActionRunner.execute(() -> view.getListPurchaseModel().addElement(notExisting));
 		window.list("purchaseList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
 		assertThat(window.list("purchaseList").contents()).containsExactly(notExisting.toString());
 		window.label("messageLable").requireText(notExisting.toString() + " not found");
 	}
 
-	
-	
 	private LocalDateTime getCurrentDate() {
-		return LocalDateTime.of(
-						now().getYear(), 
-						now().getMonth(), 
-						now().getDayOfMonth(), 
-						now().getHour(), 
-						now().getHour());
+		return LocalDateTime.of(now().getYear(), now().getMonth(), now().getDayOfMonth(), now().getHour(),
+				now().getHour());
 	}
 }
