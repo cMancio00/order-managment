@@ -276,6 +276,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	@Override
 	public void showAllPurchases(List<Purchase> purchases) {
+		listPurchaseModel.clear();
 		purchases.stream().forEach(listPurchaseModel::addElement);
 	}
 

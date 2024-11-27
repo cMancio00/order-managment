@@ -22,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.inOrder;
@@ -140,10 +141,24 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 				.execute(() -> managmentViewSwing.getListPurchaseModel().addElement(new Purchase(1, TEST_DATE, 10.0)));
 
 		window.list("clientList").clearSelection();
+		
+		GuiActionRunner
+		.execute(() -> managmentViewSwing.getListPurchaseModel().addElement(new Purchase(1, TEST_DATE, 10.0)));
+
 		window.list("purchaseList").selectItem(0);
 		deleteButton.requireDisabled();
 
+	}
+	
+	@Test @GUITest
+	public void testDeletePurchaseButtonShouldBeEnableWhenClientAndAPurchaseAreSelected(){
+		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Delete Selected Purchase"));
+		GuiActionRunner.execute(() -> managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
+
 		window.list("clientList").selectItem(0);
+		GuiActionRunner
+				.execute(() -> managmentViewSwing.getListPurchaseModel().addElement(new Purchase(1, TEST_DATE, 10.0)));
+		window.list("purchaseList").selectItem(0);
 		deleteButton.requireEnabled();
 	}
 

@@ -143,6 +143,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 	@Test @GUITest
 	public void testShowAllPurchaseOfASelectedClient(){
 		Client addedClient = service.addClient(new Client("testClient"));
+		service.addClient(new Client("anOtherClient"));
 		Purchase aPurchase = service.addPurchaseToClient(
 				addedClient,
 				new Purchase(getCurrentDate(), 10.0));
@@ -159,6 +160,12 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 				anOtherPurchase.toString()
 				);
 		
+		window.list("clientList").selectItem(1);
+		window.list("clientList").selectItem(0);
+		assertThat(window.list("purchaseList").contents()).containsExactly(
+				aPurchase.toString(),
+				anOtherPurchase.toString()
+				);
 	}
 	
 	@Test @GUITest
@@ -206,7 +213,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 				view.getListPurchaseModel().addElement(notExisting));
 		window.list("purchaseList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
-		assertThat(window.list("purchaseList").contents()).containsExactly(notExisting.toString());
+		assertThat(window.list("purchaseList").contents()).isEmpty();
 		window.label("messageLable").requireText(notExisting.toString() + " not found");
 	}
 
