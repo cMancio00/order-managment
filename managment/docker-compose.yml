@@ -1,0 +1,16 @@
+services:
+  db:
+    image: mysql:9.1.0
+    container_name: orderManagment
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: managment
+      MYSQL_USER: order-manager
+      MYSQL_PASSWORD: mysecret
+      
+# docker exec -it orderManagment mysql -u order-manager -p 
+
+

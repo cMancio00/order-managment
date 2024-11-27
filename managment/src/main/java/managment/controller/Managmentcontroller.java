@@ -1,5 +1,6 @@
 package managment.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,8 @@ public class Managmentcontroller {
 		Optional<Client> foundClient = service.findClientById(selectedClient.getId());
 		foundClient.ifPresentOrElse(client -> {
 			List<Purchase> purchases = service.findallPurchases(foundClient.get());
+			if (purchases == null)
+				purchases = Collections.emptyList();
 			view.showAllPurchases(purchases);
 		},
 			() -> handleClientNotFound(selectedClient));
