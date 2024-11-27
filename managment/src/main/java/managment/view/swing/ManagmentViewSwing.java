@@ -53,11 +53,11 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		this.managmentController = managmentController;
 	}
 
-	DefaultListModel<Client> getListClientsModel() {
+	public DefaultListModel<Client> getListClientsModel() {
 		return listClientsModel;
 	}
 	
-	DefaultListModel<Purchase> getListPurchaseModel() {
+	public DefaultListModel<Purchase> getListPurchaseModel() {
 		return listPurchaseModel;
 	}
 	
@@ -141,15 +141,14 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(btnAddNewClient, gbc_btnAddNewClient);
 		
 		btnAddAmmount = new JButton("Add Ammount");
-		btnAddAmmount.addActionListener(e -> {
+		btnAddAmmount.addActionListener(e -> 
 			managmentController.addPurchaseToSelectedClient(
 					listClients.getSelectedValue(),
 					new Purchase(
 							getCurrentDate(),
 							Float.parseFloat(txtPurchaseAmmount.getText())
-							));
-			managmentController.findAllPurchasesOf(listClients.getSelectedValue());
-		});
+							))
+		);
 		btnAddAmmount.setEnabled(false);
 		btnAddAmmount.setName("AddAmmountButton");
 		GridBagConstraints gbc_btnAddAmmount = new GridBagConstraints();
