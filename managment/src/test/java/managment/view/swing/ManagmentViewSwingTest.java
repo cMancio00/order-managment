@@ -22,7 +22,6 @@ import org.mockito.MockitoAnnotations;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.inOrder;
@@ -333,7 +332,6 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
 		InOrder inOrder = inOrder(managmentController);
 		inOrder.verify(managmentController).remove(toRemove);
-		inOrder.verify(managmentController).findAllPurchasesOf(client);
 	}
 	
 	private LocalDateTime getCurrentDate() {

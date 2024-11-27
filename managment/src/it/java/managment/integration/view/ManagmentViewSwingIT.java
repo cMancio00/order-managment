@@ -128,6 +128,28 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
 		assertThat(window.list("clientList").contents()).isEmpty();
 	}
+	
+	@Test @GUITest
+	public void testDeleteClientButtonShouldAlsoResetTheClientAndPurchaseList(){
+		Client addedClient = service.addClient(new Client("testClient"));
+		Client anOtherClient = service.addClient(new Client("anOtherClient"));
+		service.addPurchaseToClient(
+				addedClient,
+				new Purchase(getCurrentDate(), 10.0));
+		service.addPurchaseToClient(
+				addedClient,
+				new Purchase(getCurrentDate(), 5.0));
+		
+		GuiActionRunner.execute(
+				() -> controller.findAllClients());
+		
+		window.list("clientList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Client")).click();
+
+		assertThat(window.list("clientList").contents()).containsExactly(anOtherClient.toString());
+		window.list("clientList").selectItem(0);
+		assertThat(window.list("purchaseList").contents()).isEmpty();
+	}
 
 	@Test @GUITest
 	public void testDeleteClientButtonError(){
@@ -213,10 +235,11 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 				view.getListPurchaseModel().addElement(notExisting));
 		window.list("purchaseList").selectItem(0);
 		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
-		assertThat(window.list("purchaseList").contents()).isEmpty();
+		assertThat(window.list("purchaseList").contents()).containsExactly(notExisting.toString());
 		window.label("messageLable").requireText(notExisting.toString() + " not found");
 	}
 
+	
 	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(

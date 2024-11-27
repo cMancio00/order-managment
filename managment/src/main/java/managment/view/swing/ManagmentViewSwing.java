@@ -208,7 +208,6 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		btnDeleteSelectedPurchase = new JButton("Delete Selected Purchase");
 		btnDeleteSelectedPurchase.addActionListener(e -> {
 			managmentController.remove(listPurchases.getSelectedValue());
-			managmentController.findAllPurchasesOf(listClients.getSelectedValue());
 		});
 		btnDeleteSelectedPurchase.setEnabled(false);
 		btnDeleteSelectedPurchase.setName("deleteSelectedPurchase");
@@ -255,6 +254,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 
 	@Override
 	public void showAllClients(List<Client> clients) {
+		listClientsModel.clear();
 		clients.stream().forEach(listClientsModel::addElement);
 	}
 
