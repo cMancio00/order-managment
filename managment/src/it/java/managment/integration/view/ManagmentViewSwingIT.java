@@ -3,7 +3,6 @@ package managment.integration.view;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.*;
 
-
 import java.time.LocalDateTime;
 import java.util.Properties;
 
@@ -165,7 +164,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		
 	}
 	
-	@Test
+	@Test @GUITest
 	public void testAddPurchaseButtonSuccess(){
 		service.addClient(new Client("testClient"));
 		GuiActionRunner.execute(
@@ -197,6 +196,22 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 
 	}
 	
+	@Test @GUITest
+	public void testDeletePurchaseButtonError(){
+		service.addClient(new Client("testClient"));
+		
+		GuiActionRunner.execute(
+				() -> controller.findAllClients());
+		window.list("clientList").selectItem(0);
+		
+		Purchase notExisting = new Purchase(2,getCurrentDate(),5.0);
+		GuiActionRunner.execute(() -> 
+				view.getListPurchaseModel().addElement(notExisting));
+		window.list("purchaseList").selectItem(0);
+		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
+		assertThat(window.list("purchaseList").contents()).containsExactly(notExisting.toString());
+		window.label("messageLable").requireText(notExisting.toString() + " not found");
+	}
 
 	
 	private LocalDateTime getCurrentDate() {

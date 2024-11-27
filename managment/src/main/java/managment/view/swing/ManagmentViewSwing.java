@@ -57,7 +57,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		return listClientsModel;
 	}
 	
-	DefaultListModel<Purchase> getListPurchaseModel() {
+	public DefaultListModel<Purchase> getListPurchaseModel() {
 		return listPurchaseModel;
 	}
 	
