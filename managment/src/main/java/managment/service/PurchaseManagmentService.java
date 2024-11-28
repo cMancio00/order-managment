@@ -73,7 +73,7 @@ public class PurchaseManagmentService {
 		return sessionFactory.fromTransaction(session -> clientRepository.findAll(session));
 	}
 
-	public List<Purchase> findallPurchases(Client client) {
+	public List<Purchase> findAllPurchases(Client client) {
 		return sessionFactory.fromTransaction(session -> {
 			if(client.getPurchases() != null) 
 				return client.getPurchases();

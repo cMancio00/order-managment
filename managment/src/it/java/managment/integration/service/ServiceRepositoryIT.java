@@ -168,7 +168,7 @@ class ServiceRepositoryIT {
 		});
 		
 		Client toFound = sessionFactory.fromTransaction(session -> session.find(Client.class, 1));
-		List<Purchase> purchases = service.findallPurchases(toFound);
+		List<Purchase> purchases = service.findAllPurchases(toFound);
 		assertThat(purchases).containsExactly(
 				new Purchase(1, FIRST_TEST_DATE, 10.0),
 				new Purchase(2, SECOND_TEST_DATE, 5.0)

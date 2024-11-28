@@ -90,7 +90,7 @@ class ManagmentControllerTest {
 	@DisplayName("Find All Clients")
 	class FindAllClients{
 		@Test
-		@DisplayName("When clients are present should return them as list")
+		@DisplayName("When clients are present should be passed as list to the view")
 		void testFindAllClients() {
 			List<Client> clients = asList(
 					new Client(1,"aClient"),
@@ -106,7 +106,7 @@ class ManagmentControllerTest {
 	@DisplayName("Add Purchase to a Client")
 	class AddPurchaseToAClient{
 		@Test
-		@DisplayName("Add purchase to selected client when exists")
+		@DisplayName("When client exists")
 		void testAddPurchaseToSelectedClientWhenExists(){
 			Client selectedClient = new Client(1, "selectedClient");
 			Purchase toAdd = new Purchase(TEST_DATE, 5.0);
@@ -121,7 +121,7 @@ class ManagmentControllerTest {
 		}
 		
 		@Test
-		@DisplayName("Add purchase to selected client when client do not exists")
+		@DisplayName("When client do not exists")
 		void testAddPurchaseToSelectedClientWhenClientDoNotExists(){
 			Client selectedClient = new Client(1, "selectedClient");
 			Purchase toAdd = new Purchase(1, TEST_DATE, 5.0);
@@ -139,7 +139,7 @@ class ManagmentControllerTest {
 	@DisplayName("Remove Purchase")
 	class RemovePurchase{
 		@Test
-		@DisplayName("Remove purchase when exists")
+		@DisplayName("When exists")
 		void testRemovePurchaseWhenExists(){
 			Purchase toDelete = new Purchase(1, TEST_DATE, 5.0);
 			when(service.findPurchaseById(1)).thenReturn(Optional.of(toDelete));
@@ -152,7 +152,7 @@ class ManagmentControllerTest {
 		}
 		
 		@Test
-		@DisplayName("Remove purchase when purchase do not exists")
+		@DisplayName("When purchase do not exists")
 		void testRemovePurchaseWhenPurchaseDoNotExists(){
 			Purchase toDelete = new Purchase(1, TEST_DATE, 5.0);
 			when(service.findPurchaseById(1)).thenReturn(Optional.empty());
@@ -169,37 +169,37 @@ class ManagmentControllerTest {
 	@DisplayName("Find all Purchases of a Client")
 	class FindAllPurchasesOfAClient{
 		@Test
-		@DisplayName("Find all purchase of an existing selected client")
-		void findAllPurchaseOfSelectedClient(){
+		@DisplayName("When client exists")
+		void findAllPurchaseOfSelectedExistingClient(){
 			Client selectedClient = new Client(1, "selectedClient");
 			List<Purchase> purchases = asList(
-					new Purchase(TEST_DATE, 10.0),
-					new Purchase(TEST_DATE, 5.0));
+					new Purchase(1, TEST_DATE, 10.0),
+					new Purchase(2, TEST_DATE, 5.0));
 			when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
-			when(service.findallPurchases(selectedClient)).thenReturn(purchases);
+			when(service.findAllPurchases(selectedClient)).thenReturn(purchases);
 			controller.findAllPurchasesOf(selectedClient);
 			InOrder inOrder = inOrder(service,view);
 			inOrder.verify(service).findClientById(1);
-			inOrder.verify(service).findallPurchases(selectedClient);
+			inOrder.verify(service).findAllPurchases(selectedClient);
 			inOrder.verify(view).showAllPurchases(purchases);
 		}
 		
 		@Test
-		@DisplayName("Find all purchase of an existing selected client whith no purchase ")
+		@DisplayName("When client has no purchases")
 		void findAllPurchaseOfSelectedClientWhenNoPurchaseShouldReturnEmptyList(){
 			Client selectedClient = new Client(1, "selectedClient");
 
 			when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
-			when(service.findallPurchases(selectedClient)).thenReturn(null);
+			when(service.findAllPurchases(selectedClient)).thenReturn(Collections.emptyList());
 			controller.findAllPurchasesOf(selectedClient);
 			InOrder inOrder = inOrder(service,view);
 			inOrder.verify(service).findClientById(1);
-			inOrder.verify(service).findallPurchases(selectedClient);
+			inOrder.verify(service).findAllPurchases(selectedClient);
 			inOrder.verify(view).showAllPurchases(Collections.emptyList());
 		}
 		
 		@Test
-		@DisplayName("Find all purchase when selected client do not exists")
+		@DisplayName("When selected client do not exists")
 		void findAllPurchaseOfNonExistingClient(){
 			Client selectedClient = new Client(1, "selectedClient");
 			when(service.findClientById(1)).thenReturn(Optional.empty());

@@ -376,7 +376,7 @@ class PurchaseManagmentServiceTest {
 				secondPurchase.setClient(client);
 				client.setPurchases(new ArrayList<Purchase>(Arrays.asList(firstPurchase,secondPurchase)));
 				
-				List<Purchase> purchases = service.findallPurchases(client);
+				List<Purchase> purchases = service.findAllPurchases(client);
 				verify(sessionFactory, times(1)).fromTransaction(any());
 				assertThat(purchases).containsExactly(firstPurchase,secondPurchase);
 			}
@@ -386,7 +386,7 @@ class PurchaseManagmentServiceTest {
 			void findAllPurchaseOfClientwithNoPurchases() {
 				Client client = new Client(1,"testClient");
 				
-				List<Purchase> purchases = service.findallPurchases(client);
+				List<Purchase> purchases = service.findAllPurchases(client);
 				assertThat(purchases).isEmpty();
 			}
 		}
