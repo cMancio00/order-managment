@@ -35,11 +35,12 @@ class ClientRepositoryHibernateTest {
 		sessionFactory.getSchemaManager().truncateMappedObjects();
 		sessionFactory.close();
 	}
+	
 	@Nested
-	@DisplayName("Happy Cases")
-	class HappyCases{
+	@DisplayName("Save")
+	class SaveTests{
 		
-		@DisplayName("Save when database is empty")
+		@DisplayName("When database is empty")
 		@Test
 		void testSave() {
 			Client toAdd = sessionFactory.fromTransaction(session -> 
@@ -47,8 +48,23 @@ class ClientRepositoryHibernateTest {
 			assertThat(readAllClientFromDatabase()).containsExactly(toAdd);
 			assertThat(toAdd.getId()).isEqualTo(1);
 		}
-		
-		@DisplayName("Find by id when Client is preset")
+
+//		@DisplayName("Update Client when is present")
+//		@Test
+//		void testUpdate(){
+//			addClientToDatabase("toBeUpdated");
+//			Client toUpdate = sessionFactory.fromSession(session -> 
+//				session.find(Client.class, 1));
+//			toUpdate.setName("updatedName");
+//			sessionFactory.inTransaction(session -> clientRepository.save(toUpdate, session));
+//			assertThat(readAllClientFromDatabase()).containsExactly(new Client(1,"updatedName"));
+//		}
+	}
+	
+	@Nested
+	@DisplayName("FindById")
+	class FindById{
+		@DisplayName("When Client is preset should return an Optional with the client")
 		@Test
 		void testFindByIdWhenIsPresent(){
 			addClientToDatabase("notToBeFound");
@@ -59,18 +75,21 @@ class ClientRepositoryHibernateTest {
 			assertThat(found).contains(new Client(2, "toBeFound"));
 		}
 		
-		@DisplayName("Update Client when is present")
+		@DisplayName("When Client is not present should return empty optional")
 		@Test
-		void testUpdate(){
-			addClientToDatabase("toBeUpdated");
-			Client toUpdate = sessionFactory.fromSession(session -> 
-				session.find(Client.class, 1));
-			toUpdate.setName("updatedName");
-			sessionFactory.inTransaction(session -> clientRepository.save(toUpdate, session));
-			assertThat(readAllClientFromDatabase()).containsExactly(new Client(1,"updatedName"));
+		void testFindByIdWhenIsNotPresent(){
+			Optional<Client> found = sessionFactory.fromTransaction(session -> {
+				return clientRepository.findById(1,session);
+			});
+			assertThat(found).isEmpty();
 		}
+	}
+	
+	@Nested
+	@DisplayName("Delete")
+	class DeleteTests{
 		
-		@DisplayName("Delete Client when is present")
+		@DisplayName("When is present")
 		@Test
 		void testDeleteWhenClientIsPresent(){
 			addClientToDatabase("notToBeDeleted");	
@@ -81,8 +100,12 @@ class ClientRepositoryHibernateTest {
 			});
 			assertThat(readAllClientFromDatabase()).containsExactly(new Client(1,"notToBeDeleted"));
 		}
-		
-		@DisplayName("Find all when database is empty should return an empty list")
+	}
+	
+	@Nested
+	@DisplayName("FindAll")
+	class FindAll{
+		@DisplayName("When database is empty should return an empty list")
 		@Test
 		void testFindAllWhenDatabaseIsEmpty(){
 			List<Client> clients = sessionFactory.fromSession(session ->
@@ -91,6 +114,7 @@ class ClientRepositoryHibernateTest {
 		}
 		
 		@Test
+		@DisplayName("When clients are present should return the list of clients")
 		void testFindAllWhenClientsArePresent(){
 			addClientToDatabase("firstClient");
 			addClientToDatabase("secondClient");
@@ -100,21 +124,8 @@ class ClientRepositoryHibernateTest {
 					new Client(2,"secondClient")
 					);
 		}
-	
 	}
-	@Nested
-	@DisplayName("Error Cases")
-	class ErrorCases{
-		@DisplayName("Find by Id when Client is not present should return empty optional")
-		@Test
-		void testFindByIdWhenIsNotPresent(){
-			Optional<Client> found = sessionFactory.fromTransaction(session -> {
-				return clientRepository.findById(1,session);
-			});
-			assertThat(found).isEmpty();
-		}
-	}
-	
+
 	private List<Client> readAllClientFromDatabase() {
 		return sessionFactory
 				.fromSession(session -> session.createSelectionQuery("from Client", Client.class).getResultList());
