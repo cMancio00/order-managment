@@ -80,32 +80,101 @@ class PurchaseManagmentServiceTest {
 	}
 
 	@Nested
-	@DisplayName("Add Client")
-	class AddClient{
-		
-		@Test
-		@DisplayName("When Client is not null")
-		void testAddClientWhenDatabaseIsEmpty(){
-			Client aClient = new Client("aClient");
-			when(clientRepository.save(eq(aClient), any())).thenReturn(new Client(1, "aClient"));
-			Client added = service.addClient(aClient);
-			assertThat(added).isNotNull();
-			verify(clientRepository).save(aClient, session);
-			verify(sessionFactory, times(1)).fromTransaction(any());
-			verifyNoMoreInteractions(clientRepository);
-			verifyNoInteractions(purchaseRepository);
+	@DisplayName("Client")
+	class ClietCRUD{
+		@Nested
+		@DisplayName("Add Client")
+		class AddClient{
+			
+			@Test
+			@DisplayName("When Client is not null")
+			void testAddClientWhenDatabaseIsEmpty(){
+				Client aClient = new Client("aClient");
+				when(clientRepository.save(eq(aClient), any())).thenReturn(new Client(1, "aClient"));
+				Client added = service.addClient(aClient);
+				assertThat(added).isNotNull();
+				verify(clientRepository).save(aClient, session);
+				verify(sessionFactory, times(1)).fromTransaction(any());
+				verifyNoMoreInteractions(clientRepository);
+				verifyNoInteractions(purchaseRepository);
+			}
+			
+			@Test
+			@DisplayName("When Client is null should be no interactions")
+			void testAddClientWhenClientIsNull(){
+				IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+						() -> service.addClient(null));
+				assertThat(e.getMessage()).isEqualTo("Can't add a null Object");
+				verifyNoInteractions(clientRepository);
+				verifyNoInteractions(purchaseRepository);
+			}
 		}
 		
-		@Test
-		@DisplayName("When Client is null should be no interactions")
-		void testAddClientWhenClientIsNull(){
-			IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-					() -> service.addClient(null));
-			assertThat(e.getMessage()).isEqualTo("Can't add a null Object");
-			verifyNoInteractions(clientRepository);
-			verifyNoInteractions(purchaseRepository);
+		@Nested
+		@DisplayName("Delete Client")
+		class DeleteClient{
+			@Test
+			@DisplayName("When a client do not exists should do nothing")
+			void testDeleteNonExistingClient() {
+				when(clientRepository.findById(eq(1), any())).thenReturn(Optional.empty());
+				
+				service.deleteClient(new Client(1,"notExisting"));
+				verify(sessionFactory, times(1)).inTransaction(any());
+				verifyNoMoreInteractions(ignoreStubs(clientRepository));
+				verifyNoInteractions(purchaseRepository);
+			}
+			
+			@Test
+			@DisplayName("Should delete the client")
+			void testDeleteClientShouldDeleteTheClient(){
+				Optional<Client> toDelete = Optional.of(new Client(1,"toDelete"));
+				when(clientRepository.findById(eq(1), any()))
+					.thenReturn(Optional.of(new Client(1,"toDelete")));
+				
+				service.deleteClient(toDelete.get());
+				InOrder inOrder = inOrder(clientRepository);
+				inOrder.verify(clientRepository).findById(eq(1), any());
+				inOrder.verify(clientRepository).delete(eq(toDelete.get()), any());
+				verify(sessionFactory, times(1)).inTransaction(any());
+				verifyNoMoreInteractions(ignoreStubs(clientRepository));
+				verifyNoInteractions(purchaseRepository);
+			}
+			
+			@Test
+			@DisplayName("Should also delete all client's purchases")
+			void testDeleteClientShouldDeletePurchases(){
+				Optional<Client> client = Optional.of(new Client(1,"testClient"));
+				Purchase toDelete = new Purchase(1,SECOND_TEST_DATE, 5.0);
+				toDelete.setClient(client.get());
+				client.get().setPurchases(new ArrayList<Purchase>(Arrays.asList(toDelete)));
+				
+				when(clientRepository.findById(eq(1), any())).thenReturn(client);
+				
+				service.deleteClient(client.get());
+				InOrder inOrder = inOrder(clientRepository, purchaseRepository);
+				inOrder.verify(clientRepository).findById(eq(1), any());
+				inOrder.verify(purchaseRepository, times(1)).delete(any(Purchase.class), any());
+				inOrder.verify(clientRepository).delete(eq(client.get()), any());
+				verify(sessionFactory, times(1)).inTransaction(any());
+				verifyNoMoreInteractions(ignoreStubs(clientRepository));
+				verifyNoMoreInteractions(purchaseRepository);
+			}
+		}
+		
+		@Nested
+		@DisplayName("Find Client")
+		class FindClient{
+			
+		}
+		
+		@Nested
+		@DisplayName("FindAll Clients")
+		class FindAllClients{
+			
 		}
 	}
+	
+	
 	
 	@Nested
 	@DisplayName("Add Purchase")
@@ -181,36 +250,7 @@ class PurchaseManagmentServiceTest {
 			assertThat(client.getPurchases()).containsExactly(purchase);
 		}
 		
-		@Test
-		@DisplayName("Delete a non existing Client should do nothing")
-		void testDeleteNonExistingClient() {
-			when(clientRepository.findById(eq(1), any())).thenReturn(Optional.empty());
-			
-			service.deleteClient(new Client(1,"notExisting"));
-			verify(sessionFactory, times(1)).inTransaction(any());
-			verifyNoMoreInteractions(ignoreStubs(clientRepository));
-			verifyNoInteractions(purchaseRepository);
-		}
-		
-		@Test
-		@DisplayName("Delete Client should also delete all its purchases")
-		void testDeleteClient(){
-			Optional<Client> client = Optional.of(new Client(1,"testClient"));
-			Purchase toDelete = new Purchase(1,SECOND_TEST_DATE, 5.0);
-			toDelete.setClient(client.get());
-			client.get().setPurchases(new ArrayList<Purchase>(Arrays.asList(toDelete)));
-			
-			when(clientRepository.findById(eq(1), any())).thenReturn(client);
-			
-			service.deleteClient(client.get());
-			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
-			inOrder.verify(clientRepository).findById(eq(1), any());
-			inOrder.verify(purchaseRepository, times(1)).delete(any(Purchase.class), any());
-			inOrder.verify(clientRepository).delete(eq(client.get()), any());
-			verify(sessionFactory, times(1)).inTransaction(any());
-			verifyNoMoreInteractions(ignoreStubs(clientRepository));
-			verifyNoMoreInteractions(purchaseRepository);
-		}
+
 		
 		@Test
 		@DisplayName("Find all Clients should return a list of all clients")

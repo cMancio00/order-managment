@@ -57,9 +57,10 @@ public class PurchaseManagmentService {
 		sessionFactory.inTransaction(session -> {
 			Optional<Client> foundClient = clientRepository.findById(client.getId(), session);
 			foundClient.ifPresent(c -> {
-				for (Purchase purchase : c.getPurchases()) {
-					purchaseRepository.delete(purchase, session);
-				}
+				if(c.getPurchases() != null)
+					for (Purchase purchase : c.getPurchases()) {
+						purchaseRepository.delete(purchase, session);
+					}
 				clientRepository.delete(c, session);
 			});
 		});
