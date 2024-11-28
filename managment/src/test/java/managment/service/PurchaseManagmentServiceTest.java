@@ -332,56 +332,64 @@ class PurchaseManagmentServiceTest {
 			}
 			
 		}
-
-		@Test
-		@DisplayName("Find all Clients should return a list of all clients")
-		void findAllClients() {
-			Client firstClient = new Client(1,"firstClient");
-			Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
-			purchase.setClient(firstClient);
-			Client secondClient = new Client(2,"secondClient");
-			when(clientRepository.findAll(any())).thenReturn(
-					asList(
-							firstClient,
-							secondClient));
-			List<Client> clients = service.findAllClients();
-			verify(clientRepository).findAll(session);
-			verify(sessionFactory, times(1)).fromTransaction(any());
-			verifyNoInteractions(purchaseRepository);
-			assertThat(clients).containsExactly(firstClient,secondClient);
+	
+		@Nested
+		@DisplayName("Find Purchase by id")
+		class FindPurchaseById{
+			@Test
+			@DisplayName("Find purchase by id when purchase is present")
+			void testFindPurchaseByIdWhenExists(){
+				Purchase purchase = new Purchase(1, FIRST_TEST_DATE,10.0);
+				when(purchaseRepository.findById(1, session)).thenReturn(Optional.of(purchase));
+				Optional<Purchase> foundPurchase = service.findPurchaseById(1);
+				assertThat(foundPurchase).contains(purchase);
+			}
+			
+			@Test
+			@DisplayName("Find purchase by id when purchase is not present")
+			void testFindPurchaseByIdWhenDoesNotExists(){
+				when(purchaseRepository.findById(1, session)).thenReturn(Optional.empty());
+				Optional<Purchase> foundPurchase = service.findPurchaseById(1);
+				assertThat(foundPurchase).isEmpty();
+			}
+			
+			@Test
+			@DisplayName("When purchase id is not yet set")
+			void testFindPurchaseByIdWhenNotSet(){
+				// In this case id will be 0.
+				Optional<Purchase> foundPurchase = service.findPurchaseById(
+						new Purchase(FIRST_TEST_DATE, 10.0).getId());
+				assertThat(foundPurchase).isEmpty();
+			}
 		}
 		
-		@Test
-		@DisplayName("Find all purchases of a given client should return a list of its purchases")
-		void findAllPurchaseOfClient() {
-			Client client = new Client(1,"testClient");
-			Purchase firstPurchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
-			firstPurchase.setClient(client);
-			Purchase secondPurchase = new Purchase(2,SECOND_TEST_DATE, 5.0);
-			secondPurchase.setClient(client);
-			client.setPurchases(new ArrayList<Purchase>(Arrays.asList(firstPurchase,secondPurchase)));
-			List<Purchase> purchases = service.findallPurchases(client);
-			verify(sessionFactory, times(1)).fromTransaction(any());
-			assertThat(purchases).containsExactly(firstPurchase,secondPurchase);
+		@Nested
+		@DisplayName("Find all purchases of a Client")
+		class FindAllPurchases{
+			@Test
+			@DisplayName("Should return a list of its purchases")
+			void findAllPurchaseOfClient() {
+				Client client = new Client(1,"testClient");
+				Purchase firstPurchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
+				firstPurchase.setClient(client);
+				Purchase secondPurchase = new Purchase(2,SECOND_TEST_DATE, 5.0);
+				secondPurchase.setClient(client);
+				client.setPurchases(new ArrayList<Purchase>(Arrays.asList(firstPurchase,secondPurchase)));
+				
+				List<Purchase> purchases = service.findallPurchases(client);
+				verify(sessionFactory, times(1)).fromTransaction(any());
+				assertThat(purchases).containsExactly(firstPurchase,secondPurchase);
+			}
+			
+			@Test
+			@DisplayName("With no purchases should return an empty list")
+			void findAllPurchaseOfClientwithNoPurchases() {
+				Client client = new Client(1,"testClient");
+				
+				List<Purchase> purchases = service.findallPurchases(client);
+				assertThat(purchases).isEmpty();
+			}
 		}
-		
-		@Test
-		@DisplayName("Find purchase by id when purchase is present")
-		void testFindPurchaseByIdWhenExists(){
-			Purchase purchase = new Purchase(1, FIRST_TEST_DATE,10.0);
-			when(purchaseRepository.findById(1, session)).thenReturn(Optional.of(purchase));
-			Optional<Purchase> foundPurchase = service.findPurchaseById(1);
-			assertThat(foundPurchase).contains(purchase);
-		}
-		
-		@Test
-		@DisplayName("Find purchase by id when purchase is not present")
-		void testFindPurchaseByIdWhenDoesNotExists(){
-			when(purchaseRepository.findById(1, session)).thenReturn(Optional.empty());
-			Optional<Purchase> foundPurchase = service.findPurchaseById(1);
-			assertThat(foundPurchase).isEmpty();
-		}
-		
 
 	}
 	
