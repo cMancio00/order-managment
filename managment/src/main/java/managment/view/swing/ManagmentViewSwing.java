@@ -162,12 +162,12 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		listClients = new JList<>(listClientsModel);
 
 		listClients.addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {	
+			if (!e.getValueIsAdjusting() && listClients.getSelectedValue() != null)
 				managmentController.findAllPurchasesOf(listClients.getSelectedValue());
-				btnDeleteSelectedClientEnabler();
-				btnDeleteSelectedPurchaseEnabler();
-				btnAddAmmountEnabler();
-			}
+			btnDeleteSelectedClientEnabler();
+			btnDeleteSelectedPurchaseEnabler();
+			btnAddAmmountEnabler();
+			
 		});
 		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listClients.setName("clientList");
@@ -193,9 +193,8 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(listPurchases, gbc_listPurchases);
 		
 		btnDeleteSelectedClient = new JButton("Delete Selected Client");
-		btnDeleteSelectedClient.addActionListener(e -> 
-			managmentController.remove(listClients.getSelectedValue())
-				);
+		btnDeleteSelectedClient.addActionListener(e ->		
+			managmentController.remove(listClients.getSelectedValue()));
 		btnDeleteSelectedClient.setName("deleteSelectedClient");
 		btnDeleteSelectedClient.setEnabled(false);
 		GridBagConstraints gbc_btnDeleteSelectedClient = new GridBagConstraints();
