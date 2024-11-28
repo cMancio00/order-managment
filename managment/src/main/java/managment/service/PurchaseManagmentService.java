@@ -1,6 +1,7 @@
 package managment.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.hibernate.SessionFactory;
@@ -31,21 +32,24 @@ public class PurchaseManagmentService {
 			client.getPurchases().add(addedPurchase);
 			return addedPurchase;
 		});
-
-		
 	}
 
 	public Client addClient(Client client) {
+		if(client == null)
+			throw new IllegalArgumentException("Can't add a null Object");
 		return sessionFactory.fromTransaction(session -> clientRepository.save(client, session));
 	}
 
 	public void deletePurchase(Purchase toDelete) {
+		if(toDelete.getClient() == null)
+			throw new IllegalArgumentException("Purchase has no Client");
 		sessionFactory.inTransaction(session -> {
 			Optional<Client> foundClient = clientRepository.findById(toDelete.getClient().getId(), session);
 			foundClient.ifPresent(client ->{
-				client.getPurchases().remove(toDelete);
-				purchaseRepository.delete(toDelete, session);
-				clientRepository.save(client, session);
+				if(client.getPurchases().remove(toDelete)) {
+					purchaseRepository.delete(toDelete, session);
+					clientRepository.save(client, session);
+				}	
 			});
 		});
 		
@@ -55,9 +59,10 @@ public class PurchaseManagmentService {
 		sessionFactory.inTransaction(session -> {
 			Optional<Client> foundClient = clientRepository.findById(client.getId(), session);
 			foundClient.ifPresent(c -> {
-				for (Purchase purchase : c.getPurchases()) {
-					purchaseRepository.delete(purchase, session);
-				}
+				if(c.getPurchases() != null)
+					for (Purchase purchase : c.getPurchases()) {
+						purchaseRepository.delete(purchase, session);
+					}
 				clientRepository.delete(c, session);
 			});
 		});
@@ -68,8 +73,12 @@ public class PurchaseManagmentService {
 		return sessionFactory.fromTransaction(session -> clientRepository.findAll(session));
 	}
 
-	public List<Purchase> findallPurchases(Client client) {
-		return sessionFactory.fromTransaction(session -> client.getPurchases());
+	public List<Purchase> findAllPurchases(Client client) {
+		return sessionFactory.fromTransaction(session -> {
+			if(client.getPurchases() != null) 
+				return client.getPurchases();
+			return Collections.emptyList();
+		});
 	}
 	
 	public Optional<Client> findClientById(int id) {

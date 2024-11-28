@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import managment.controller.Managmentcontroller;
+import managment.controller.ManagmentController;
 import managment.model.Client;
 import managment.model.Purchase;
 import managment.view.ManagmentView;
@@ -31,7 +31,7 @@ import java.util.List;
 
 public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	
-	private transient Managmentcontroller managmentController;
+	private transient ManagmentController managmentController;
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -49,7 +49,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	private DefaultListModel<Client> listClientsModel;
 	private DefaultListModel<Purchase> listPurchaseModel;
 		
-	public void setManagmentController(Managmentcontroller managmentController) {
+	public void setManagmentController(ManagmentController managmentController) {
 		this.managmentController = managmentController;
 	}
 
@@ -162,12 +162,12 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		listClients = new JList<>(listClientsModel);
 
 		listClients.addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {	
+			if (!e.getValueIsAdjusting() && listClients.getSelectedValue() != null)
 				managmentController.findAllPurchasesOf(listClients.getSelectedValue());
-				btnDeleteSelectedClientEnabler();
-				btnDeleteSelectedPurchaseEnabler();
-				btnAddAmmountEnabler();
-			}
+			btnDeleteSelectedClientEnabler();
+			btnDeleteSelectedPurchaseEnabler();
+			btnAddAmmountEnabler();
+			
 		});
 		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listClients.setName("clientList");
@@ -193,9 +193,8 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(listPurchases, gbc_listPurchases);
 		
 		btnDeleteSelectedClient = new JButton("Delete Selected Client");
-		btnDeleteSelectedClient.addActionListener(e -> 
-			managmentController.remove(listClients.getSelectedValue())
-				);
+		btnDeleteSelectedClient.addActionListener(e ->		
+			managmentController.remove(listClients.getSelectedValue()));
 		btnDeleteSelectedClient.setName("deleteSelectedClient");
 		btnDeleteSelectedClient.setEnabled(false);
 		GridBagConstraints gbc_btnDeleteSelectedClient = new GridBagConstraints();
@@ -304,11 +303,11 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(
-						now().getYear(), 
-						now().getMonth(), 
-						now().getDayOfMonth(), 
-						now().getHour(), 
-						now().getHour());
+				now().getYear(),
+				now().getMonth(),
+				now().getDayOfMonth(),
+				now().getHour(),
+				now().getMinute());
 	}
 
 }

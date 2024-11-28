@@ -41,10 +41,9 @@ class PurchaseRepositoryHibernateTest {
 	}
 
 	@Nested
-	@DisplayName("Happy Cases")
-	class HappyCases{
-		
-		@DisplayName("Save when database is empty")
+	@DisplayName("Save")
+	class SaveTests{
+		@DisplayName("When database is empty")
 		@Test
 		void testSave() {
 			Purchase toAdd = sessionFactory.fromTransaction(session -> 
@@ -52,59 +51,39 @@ class PurchaseRepositoryHibernateTest {
 			assertThat(readAllOrdersFromDatabase()).containsExactly(toAdd);
 			assertThat(toAdd.getId()).isEqualTo(1);
 		}
-		@DisplayName("Find by id when Purchase is preset")
+		
+		@DisplayName("When database is not empy")
+		@Test
+		void testSaveNotEmpty(){
+			addOrderToDatabase(new Purchase(FIRST_TEST_DATE, 10.0));
+			Purchase toAdd = sessionFactory.fromTransaction(session -> 
+				purchaseRepository.save(new Purchase(SECOND_TEST_DATE, 5.0), session));
+			assertThat(readAllOrdersFromDatabase())
+				.containsExactly(
+						new Purchase(1, FIRST_TEST_DATE, 10.0),
+						toAdd
+						);
+			assertThat(toAdd.getId()).isEqualTo(2);
+		}
+	}
+	
+	@Nested
+	@DisplayName("FindById")
+	class FindById{
+		@DisplayName("When is preset should return an Optional with the purchase")
 		@Test
 		void testFindByIdWhenIsPresent(){
 			Purchase notToBeFound = new Purchase(FIRST_TEST_DATE, 10.0);
 			Purchase toBeFound = new Purchase(SECOND_TEST_DATE, 5.0);
-			addOrderToDataBase(notToBeFound);
-			addOrderToDataBase(toBeFound);
+			addOrderToDatabase(notToBeFound);
+			addOrderToDatabase(toBeFound);
 			Optional<Purchase> found = sessionFactory.fromTransaction(session -> {
 				return purchaseRepository.findById(2, session);
 			});
 			assertThat(found).contains(new Purchase(2, SECOND_TEST_DATE, 5.0));
 		}
 		
-		@DisplayName("Delete Purchase when is present")
-		@Test
-		void testDeleteWhenClientIsPresent(){
-			Purchase notToDeleted = new Purchase(FIRST_TEST_DATE, 10.0);
-			Purchase toBeDeleted = new Purchase(SECOND_TEST_DATE, 5.0);
-			addOrderToDataBase(notToDeleted);
-			addOrderToDataBase(toBeDeleted);
-			sessionFactory.inTransaction(session -> {
-				Purchase toDelete = session.find(Purchase.class, 2);
-				purchaseRepository.delete(toDelete, session);
-			});
-			assertThat(readAllOrdersFromDatabase()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
-		}
-		
-		@DisplayName("Find all when database is empty should return an empty list")
-		@Test
-		void testFindAllWhenDatabaseIsEmpty(){
-			List<Purchase> clients = sessionFactory.fromSession(session ->
-				 purchaseRepository.findAll(session));
-			assertThat(clients).isEmpty();
-		}
-		@DisplayName("Find all when purchases are present should return the list of purchases")
-		@Test
-		void testFindAllWhenClientsArePresent(){
-			Purchase firstOrder = new Purchase(FIRST_TEST_DATE, 10.0);
-			Purchase secondOrder = new Purchase(SECOND_TEST_DATE, 5.0);
-			addOrderToDataBase(firstOrder);
-			addOrderToDataBase(secondOrder);
-			List<Purchase> orders = sessionFactory.fromSession(session -> purchaseRepository.findAll(session));
-			assertThat(orders).containsExactly(
-					new Purchase(1, FIRST_TEST_DATE, 10.0),
-					new Purchase(2, SECOND_TEST_DATE, 5.0)
-				);
-		}
-	}
-	
-	@Nested
-	@DisplayName("Error Cases")
-	class ErrorCases{
-		@DisplayName("Find by Id when Purchase is not present should return empty optional")
+		@DisplayName("When Purchase is not present should return empty optional")
 		@Test
 		void testFindByIdWhenIsNotPresent(){
 			Optional<Purchase> found = sessionFactory.fromTransaction(session -> {
@@ -114,12 +93,68 @@ class PurchaseRepositoryHibernateTest {
 		}
 	}
 	
+	@Nested
+	@DisplayName("Delete")
+	class DeleteTests{
+		@DisplayName("When is present should remove it")
+		@Test
+		void testDeleteWhenClientIsPresent(){
+			Purchase notToDeleted = new Purchase(FIRST_TEST_DATE, 10.0);
+			Purchase toBeDeleted = new Purchase(SECOND_TEST_DATE, 5.0);
+			addOrderToDatabase(notToDeleted);
+			addOrderToDatabase(toBeDeleted);
+			sessionFactory.inTransaction(session -> {
+				Purchase toDelete = session.find(Purchase.class, 2);
+				purchaseRepository.delete(toDelete, session);
+			});
+			assertThat(readAllOrdersFromDatabase()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
+		}
+		
+		@DisplayName("When is not present should do nothing")
+		@Test
+		void testDeleteWhenPurchaseIsNotPresent(){
+			Purchase notToDeleted = new Purchase(FIRST_TEST_DATE, 10.0);
+			addOrderToDatabase(notToDeleted);
+			sessionFactory.inTransaction(session -> {
+				Purchase toDelete = session.find(Purchase.class, 2);
+				purchaseRepository.delete(toDelete, session);
+			});
+			assertThat(readAllOrdersFromDatabase()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
+		}
+	}
+	
+	@Nested
+	@DisplayName("FindAll")
+	class FindAll{
+		@DisplayName("When database is empty should return an empty list")
+		@Test
+		void testFindAllWhenDatabaseIsEmpty(){
+			List<Purchase> clients = sessionFactory.fromSession(session ->
+				 purchaseRepository.findAll(session));
+			assertThat(clients).isEmpty();
+		}
+		
+		@DisplayName("When purchases are present should return the list of purchases")
+		@Test
+		void testFindAllWhenClientsArePresent(){
+			Purchase firstOrder = new Purchase(FIRST_TEST_DATE, 10.0);
+			Purchase secondOrder = new Purchase(SECOND_TEST_DATE, 5.0);
+			addOrderToDatabase(firstOrder);
+			addOrderToDatabase(secondOrder);
+			List<Purchase> orders = sessionFactory.fromSession(session -> purchaseRepository.findAll(session));
+			assertThat(orders).containsExactly(
+					new Purchase(1, FIRST_TEST_DATE, 10.0),
+					new Purchase(2, SECOND_TEST_DATE, 5.0)
+				);
+		}
+	}
+
 	private List<Purchase> readAllOrdersFromDatabase() {
 		return sessionFactory.fromTransaction(
 				session -> session.createSelectionQuery("from Purchase", Purchase.class).getResultList());
 	}
 	
-	private void addOrderToDataBase(Purchase order) {
-		sessionFactory.inTransaction(session -> session.persist(order));
+	private void addOrderToDatabase(Purchase purchase) {
+		sessionFactory.inTransaction(session -> session.persist(purchase));
 	}
 }

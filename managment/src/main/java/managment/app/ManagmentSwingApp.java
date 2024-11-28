@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import managment.controller.Managmentcontroller;
+import managment.controller.ManagmentController;
 import managment.repository.client.ClientRepository;
 import managment.repository.client.ClientRepositoryHibernate;
 import managment.repository.purchase.PurchaseRepository;
@@ -70,7 +70,7 @@ public class ManagmentSwingApp implements Callable<Void> {
 						purchaseRepository);
 				ManagmentViewSwing view = new ManagmentViewSwing();
 
-				Managmentcontroller controller = new Managmentcontroller(view, service);
+				ManagmentController controller = new ManagmentController(view, service);
 				view.setManagmentController(controller);
 
 				view.setVisible(true);

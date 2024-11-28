@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import managment.controller.Managmentcontroller;
+import managment.controller.ManagmentController;
 import managment.model.Client;
 import managment.model.Purchase;
 import managment.repository.client.ClientRepository;
@@ -48,7 +48,7 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 	private ClientRepository clientRepository;
 	private PurchaseRepository purchaseRepository;
 	private PurchaseManagmentService service;
-	private Managmentcontroller controller;
+	private ManagmentController controller;
 	private ManagmentViewSwing view;
 
 	private FrameFixture window;
@@ -71,10 +71,10 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 		purchaseRepository = new PurchaseRepositoryHibernate();
 		service = new PurchaseManagmentService(sessionFactory, clientRepository, purchaseRepository);
 		Client aClient = service.addClient(new Client("aClient"));
-		Client otherClient = service.addClient(new Client("otherClient"));
+		service.addClient(new Client("otherClient"));
 
-		Purchase aPurchase = service.addPurchaseToClient(aClient, new Purchase(getCurrentDate(), 10.0));
-		Purchase otherPurchase = service.addPurchaseToClient(aClient, new Purchase(getCurrentDate(), 5.0));
+		service.addPurchaseToClient(aClient, new Purchase(getCurrentDate(), 10.0));
+		service.addPurchaseToClient(aClient, new Purchase(getCurrentDate(), 5.0));
 		GuiActionRunner.execute(() -> controller.findAllClients());
 	}
 
@@ -92,7 +92,7 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> {
 			view = new ManagmentViewSwing();
-			controller = new Managmentcontroller(view, service);
+			controller = new ManagmentController(view, service);
 			view.setManagmentController(controller);
 			return view;
 		});
@@ -156,7 +156,11 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 	
 
 	private LocalDateTime getCurrentDate() {
-		return LocalDateTime.of(now().getYear(), now().getMonth(), now().getDayOfMonth(), now().getHour(),
-				now().getHour());
+		return LocalDateTime.of(
+				now().getYear(),
+				now().getMonth(),
+				now().getDayOfMonth(),
+				now().getHour(),
+				now().getMinute());
 	}
 }

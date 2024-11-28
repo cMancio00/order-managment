@@ -21,7 +21,8 @@ public class PurchaseRepositoryHibernate implements PurchaseRepository{
 
 	@Override
 	public void delete(Purchase toDelete, Session session) {
-		session.remove(session.find(Purchase.class, toDelete.getId()));
+		if(toDelete != null)
+			session.remove(session.find(Purchase.class, toDelete.getId()));
 	}
 
 	@Override

@@ -41,24 +41,14 @@ class ManagmentControllerTest {
 	private ManagmentView view;
 	
 	@InjectMocks
-	private Managmentcontroller controller;
-	
+	private ManagmentController controller;
+		
 	@Nested
-	@DisplayName("Happy Cases")
-	class HappyCases{
-		
+	@DisplayName("Add Client")
+	class AddClient{
 		@Test
-		@DisplayName("Find all Clients when a client is present should return it as list")
-		void testFindAllClients() {
-			List<Client> clients = asList(new Client(1,"aClient"));
-			when(service.findAllClients()).thenReturn(clients);
-			controller.findAllClients();
-			verify(view).showAllClients(clients);
-		}
-		
-		@Test
-		@DisplayName("Add client")
-		void testAddClient(){
+		@DisplayName("When non existing")
+		void testAddClientWhenNonExisting(){
 			Client toAdd = new Client("toAdd");
 			when(service.addClient(toAdd)).thenReturn(new Client(1, "toAdd"));
 			controller.add(toAdd);
@@ -66,9 +56,13 @@ class ManagmentControllerTest {
 			inOrder.verify(service).addClient(new Client("toAdd"));
 			inOrder.verify(view).clientAdded(new Client(1, "toAdd"));
 		}
-		
+	}
+	
+	@Nested
+	@DisplayName("Remove Client")
+	class RemoveClient{
 		@Test
-		@DisplayName("Remove client when existing")
+		@DisplayName("When existing")
 		void testRemoveClientWhenExisting(){
 			Client toDelete = new Client(1, "toDelete");
 			when(service.findClientById(1)).thenReturn(Optional.of(toDelete));
@@ -80,37 +74,39 @@ class ManagmentControllerTest {
 		}
 		
 		@Test
-		@DisplayName("Find all purchase of an existing selected client")
-		void findAllPurchaseOfSelectedClient(){
-			Client selectedClient = new Client(1, "selectedClient");
-			List<Purchase> purchases = asList(
-					new Purchase(TEST_DATE, 10.0),
-					new Purchase(TEST_DATE, 5.0));
-			when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
-			when(service.findallPurchases(selectedClient)).thenReturn(purchases);
-			controller.findAllPurchasesOf(selectedClient);
+		@DisplayName("When not existing")
+		void testRemoveClientWhenNotExisting(){
+			Client toDelete = new Client(1, "toDelete");
+			when(service.findClientById(1)).thenReturn(Optional.empty());
+			controller.remove(toDelete);
 			InOrder inOrder = inOrder(service,view);
 			inOrder.verify(service).findClientById(1);
-			inOrder.verify(service).findallPurchases(selectedClient);
-			inOrder.verify(view).showAllPurchases(purchases);
+			inOrder.verify(view).showClientNotFoundError("Client [id=1, name=toDelete] not found", toDelete);
+			verifyNoMoreInteractions(ignoreStubs(service));
+		}
+	}
+	
+	@Nested
+	@DisplayName("Find All Clients")
+	class FindAllClients{
+		@Test
+		@DisplayName("When clients are present should be passed as list to the view")
+		void testFindAllClients() {
+			List<Client> clients = asList(
+					new Client(1,"aClient"),
+					new Client(2,"anOtherClient"));
+			when(service.findAllClients()).thenReturn(clients);
+			controller.findAllClients();
+			verify(view).showAllClients(clients);
 		}
 		
+	}
+	
+	@Nested
+	@DisplayName("Add Purchase to a Client")
+	class AddPurchaseToAClient{
 		@Test
-		@DisplayName("Find all purchase of an existing selected client whith no purchase ")
-		void findAllPurchaseOfSelectedClientWhenNoPurchaseShouldReturnEmptyList(){
-			Client selectedClient = new Client(1, "selectedClient");
-
-			when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
-			when(service.findallPurchases(selectedClient)).thenReturn(null);
-			controller.findAllPurchasesOf(selectedClient);
-			InOrder inOrder = inOrder(service,view);
-			inOrder.verify(service).findClientById(1);
-			inOrder.verify(service).findallPurchases(selectedClient);
-			inOrder.verify(view).showAllPurchases(Collections.emptyList());
-		}
-		
-		@Test
-		@DisplayName("Add purchase to selected client when exists")
+		@DisplayName("When client exists")
 		void testAddPurchaseToSelectedClientWhenExists(){
 			Client selectedClient = new Client(1, "selectedClient");
 			Purchase toAdd = new Purchase(TEST_DATE, 5.0);
@@ -125,49 +121,7 @@ class ManagmentControllerTest {
 		}
 		
 		@Test
-		@DisplayName("Remove purchase when exists")
-		void testRemovePurchaseWhenExists(){
-			Purchase toDelete = new Purchase(1, TEST_DATE, 5.0);
-			when(service.findPurchaseById(1)).thenReturn(Optional.of(toDelete));
-			
-			controller.remove(toDelete);
-			InOrder inOrder = inOrder(service,view);
-			inOrder.verify(service).findPurchaseById(1);
-			inOrder.verify(service).deletePurchase(toDelete);
-			inOrder.verify(view).purchaseRemoved(toDelete);
-		}
-	}
-	
-	@Nested
-	@DisplayName("Not Found Behavior")
-	class NotFoundError{
-		
-		@Test
-		@DisplayName("Remove client when not existing")
-		void testRemoveClientWhenNotExisting(){
-			Client toDelete = new Client(1, "toDelete");
-			when(service.findClientById(1)).thenReturn(Optional.empty());
-			controller.remove(toDelete);
-			InOrder inOrder = inOrder(service,view);
-			inOrder.verify(service).findClientById(1);
-			inOrder.verify(view).showClientNotFoundError("Client [id=1, name=toDelete] not found", toDelete);
-			verifyNoMoreInteractions(ignoreStubs(service));
-		}
-		
-		@Test
-		@DisplayName("Find all purchase when selected client do not exists")
-		void findAllPurchaseOfNonExistingClient(){
-			Client selectedClient = new Client(1, "selectedClient");
-			when(service.findClientById(1)).thenReturn(Optional.empty());
-			controller.findAllPurchasesOf(selectedClient);
-			InOrder inOrder = inOrder(service,view);
-			inOrder.verify(service).findClientById(1);
-			inOrder.verify(view).showClientNotFoundError("Client [id=1, name=selectedClient] not found", selectedClient);
-			verifyNoMoreInteractions(ignoreStubs(service));
-		}
-		
-		@Test
-		@DisplayName("Add purchase to selected client when client do not exists")
+		@DisplayName("When client do not exists")
 		void testAddPurchaseToSelectedClientWhenClientDoNotExists(){
 			Client selectedClient = new Client(1, "selectedClient");
 			Purchase toAdd = new Purchase(1, TEST_DATE, 5.0);
@@ -179,9 +133,26 @@ class ManagmentControllerTest {
 			inOrder.verify(view).showClientNotFoundError("Client [id=1, name=selectedClient] not found", selectedClient);
 			verifyNoMoreInteractions(service);
 		}
+	}
+	
+	@Nested
+	@DisplayName("Remove Purchase")
+	class RemovePurchase{
+		@Test
+		@DisplayName("When exists")
+		void testRemovePurchaseWhenExists(){
+			Purchase toDelete = new Purchase(1, TEST_DATE, 5.0);
+			when(service.findPurchaseById(1)).thenReturn(Optional.of(toDelete));
+			
+			controller.remove(toDelete);
+			InOrder inOrder = inOrder(service,view);
+			inOrder.verify(service).findPurchaseById(1);
+			inOrder.verify(service).deletePurchase(toDelete);
+			inOrder.verify(view).purchaseRemoved(toDelete);
+		}
 		
 		@Test
-		@DisplayName("Remove purchase when purchase do not exists")
+		@DisplayName("When purchase do not exists")
 		void testRemovePurchaseWhenPurchaseDoNotExists(){
 			Purchase toDelete = new Purchase(1, TEST_DATE, 5.0);
 			when(service.findPurchaseById(1)).thenReturn(Optional.empty());
@@ -193,5 +164,51 @@ class ManagmentControllerTest {
 			verifyNoMoreInteractions(service);
 		}
 	}
+	
+	@Nested
+	@DisplayName("Find all Purchases of a Client")
+	class FindAllPurchasesOfAClient{
+		@Test
+		@DisplayName("When client exists")
+		void findAllPurchaseOfSelectedExistingClient(){
+			Client selectedClient = new Client(1, "selectedClient");
+			List<Purchase> purchases = asList(
+					new Purchase(1, TEST_DATE, 10.0),
+					new Purchase(2, TEST_DATE, 5.0));
+			when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
+			when(service.findAllPurchases(selectedClient)).thenReturn(purchases);
+			controller.findAllPurchasesOf(selectedClient);
+			InOrder inOrder = inOrder(service,view);
+			inOrder.verify(service).findClientById(1);
+			inOrder.verify(service).findAllPurchases(selectedClient);
+			inOrder.verify(view).showAllPurchases(purchases);
+		}
+		
+		@Test
+		@DisplayName("When client has no purchases")
+		void findAllPurchaseOfSelectedClientWhenNoPurchaseShouldReturnEmptyList(){
+			Client selectedClient = new Client(1, "selectedClient");
 
+			when(service.findClientById(1)).thenReturn(Optional.of(selectedClient));
+			when(service.findAllPurchases(selectedClient)).thenReturn(Collections.emptyList());
+			controller.findAllPurchasesOf(selectedClient);
+			InOrder inOrder = inOrder(service,view);
+			inOrder.verify(service).findClientById(1);
+			inOrder.verify(service).findAllPurchases(selectedClient);
+			inOrder.verify(view).showAllPurchases(Collections.emptyList());
+		}
+		
+		@Test
+		@DisplayName("When selected client do not exists")
+		void findAllPurchaseOfNonExistingClient(){
+			Client selectedClient = new Client(1, "selectedClient");
+			when(service.findClientById(1)).thenReturn(Optional.empty());
+			controller.findAllPurchasesOf(selectedClient);
+			InOrder inOrder = inOrder(service,view);
+			inOrder.verify(service).findClientById(1);
+			inOrder.verify(view).showClientNotFoundError("Client [id=1, name=selectedClient] not found", selectedClient);
+			verifyNoMoreInteractions(ignoreStubs(service));
+		}
+	}
+	
 }
