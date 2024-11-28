@@ -51,6 +51,20 @@ class PurchaseRepositoryHibernateTest {
 			assertThat(readAllOrdersFromDatabase()).containsExactly(toAdd);
 			assertThat(toAdd.getId()).isEqualTo(1);
 		}
+		
+		@DisplayName("When database is not empy")
+		@Test
+		void testSaveNotEmpty(){
+			addOrderToDatabase(new Purchase(FIRST_TEST_DATE, 10.0));
+			Purchase toAdd = sessionFactory.fromTransaction(session -> 
+				purchaseRepository.save(new Purchase(SECOND_TEST_DATE, 5.0), session));
+			assertThat(readAllOrdersFromDatabase())
+				.containsExactly(
+						new Purchase(1, FIRST_TEST_DATE, 10.0),
+						toAdd
+						);
+			assertThat(toAdd.getId()).isEqualTo(2);
+		}
 	}
 	
 	@Nested
@@ -61,8 +75,8 @@ class PurchaseRepositoryHibernateTest {
 		void testFindByIdWhenIsPresent(){
 			Purchase notToBeFound = new Purchase(FIRST_TEST_DATE, 10.0);
 			Purchase toBeFound = new Purchase(SECOND_TEST_DATE, 5.0);
-			addOrderToDataBase(notToBeFound);
-			addOrderToDataBase(toBeFound);
+			addOrderToDatabase(notToBeFound);
+			addOrderToDatabase(toBeFound);
 			Optional<Purchase> found = sessionFactory.fromTransaction(session -> {
 				return purchaseRepository.findById(2, session);
 			});
@@ -87,8 +101,20 @@ class PurchaseRepositoryHibernateTest {
 		void testDeleteWhenClientIsPresent(){
 			Purchase notToDeleted = new Purchase(FIRST_TEST_DATE, 10.0);
 			Purchase toBeDeleted = new Purchase(SECOND_TEST_DATE, 5.0);
-			addOrderToDataBase(notToDeleted);
-			addOrderToDataBase(toBeDeleted);
+			addOrderToDatabase(notToDeleted);
+			addOrderToDatabase(toBeDeleted);
+			sessionFactory.inTransaction(session -> {
+				Purchase toDelete = session.find(Purchase.class, 2);
+				purchaseRepository.delete(toDelete, session);
+			});
+			assertThat(readAllOrdersFromDatabase()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
+		}
+		
+		@DisplayName("When is not present should do nothing")
+		@Test
+		void testDeleteWhenPurchaseIsNotPresent(){
+			Purchase notToDeleted = new Purchase(FIRST_TEST_DATE, 10.0);
+			addOrderToDatabase(notToDeleted);
 			sessionFactory.inTransaction(session -> {
 				Purchase toDelete = session.find(Purchase.class, 2);
 				purchaseRepository.delete(toDelete, session);
@@ -113,8 +139,8 @@ class PurchaseRepositoryHibernateTest {
 		void testFindAllWhenClientsArePresent(){
 			Purchase firstOrder = new Purchase(FIRST_TEST_DATE, 10.0);
 			Purchase secondOrder = new Purchase(SECOND_TEST_DATE, 5.0);
-			addOrderToDataBase(firstOrder);
-			addOrderToDataBase(secondOrder);
+			addOrderToDatabase(firstOrder);
+			addOrderToDatabase(secondOrder);
 			List<Purchase> orders = sessionFactory.fromSession(session -> purchaseRepository.findAll(session));
 			assertThat(orders).containsExactly(
 					new Purchase(1, FIRST_TEST_DATE, 10.0),
@@ -128,7 +154,7 @@ class PurchaseRepositoryHibernateTest {
 				session -> session.createSelectionQuery("from Purchase", Purchase.class).getResultList());
 	}
 	
-	private void addOrderToDataBase(Purchase order) {
-		sessionFactory.inTransaction(session -> session.persist(order));
+	private void addOrderToDatabase(Purchase purchase) {
+		sessionFactory.inTransaction(session -> session.persist(purchase));
 	}
 }
