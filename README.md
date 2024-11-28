@@ -75,3 +75,20 @@ Assuming you have `Maven` and at least `Java 11` installed.
 > [!WARNING]
 > The container must be starded even when using maven
 
+If you are interest in running all the tests with `code coverage` report and `mutation testing` you can run:
+
+```bash
+mvn clean verify -Pjacoco,mutation-testing
+```
+
+The code coverage report will be in `target/site/jacoco/index.html`.
+
+The mutation report will be in `target/pit-reports/index.html`.
+
+The `surefire` and `failsafe` reports (i.e unit test and IT and E2E test report) can be generated with:
+
+```bash
+mvn surefire-report:report-only surefire-report:failsafe-report-only site:site -DgenerateReports=false
+```
+
+Reports will be stored in `target/reports/surefire.html` and `target/reports/failsafe.html`
