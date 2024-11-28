@@ -43,9 +43,9 @@ docker compose down
 will stop the container.
 Using
 ```bash
-docker compose down -d
+docker compose down -v
 ```
-will also remove the created container.
+will also remove the created container and volumes.
 
 > [!NOTE]
 > You must run the `docker compose` command in the same directory of the file `docker-compose.yml`.
