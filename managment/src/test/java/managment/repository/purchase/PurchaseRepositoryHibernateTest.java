@@ -41,10 +41,9 @@ class PurchaseRepositoryHibernateTest {
 	}
 
 	@Nested
-	@DisplayName("Happy Cases")
-	class HappyCases{
-		
-		@DisplayName("Save when database is empty")
+	@DisplayName("Save")
+	class SaveTests{
+		@DisplayName("When database is empty")
 		@Test
 		void testSave() {
 			Purchase toAdd = sessionFactory.fromTransaction(session -> 
@@ -52,6 +51,11 @@ class PurchaseRepositoryHibernateTest {
 			assertThat(readAllOrdersFromDatabase()).containsExactly(toAdd);
 			assertThat(toAdd.getId()).isEqualTo(1);
 		}
+	}
+	
+	@Nested
+	@DisplayName("FindById")
+	class FindById{
 		@DisplayName("Find by id when Purchase is preset")
 		@Test
 		void testFindByIdWhenIsPresent(){
@@ -65,6 +69,19 @@ class PurchaseRepositoryHibernateTest {
 			assertThat(found).contains(new Purchase(2, SECOND_TEST_DATE, 5.0));
 		}
 		
+		@DisplayName("Find by Id when Purchase is not present should return empty optional")
+		@Test
+		void testFindByIdWhenIsNotPresent(){
+			Optional<Purchase> found = sessionFactory.fromTransaction(session -> {
+				return purchaseRepository.findById(1,session);
+			});
+			assertThat(found).isEmpty();
+		}
+	}
+	
+	@Nested
+	@DisplayName("Delete")
+	class DeleteTests{
 		@DisplayName("Delete Purchase when is present")
 		@Test
 		void testDeleteWhenClientIsPresent(){
@@ -78,7 +95,11 @@ class PurchaseRepositoryHibernateTest {
 			});
 			assertThat(readAllOrdersFromDatabase()).containsExactly(new Purchase(1, FIRST_TEST_DATE, 10.0));
 		}
-		
+	}
+	
+	@Nested
+	@DisplayName("FindAll")
+	class FindAll{
 		@DisplayName("Find all when database is empty should return an empty list")
 		@Test
 		void testFindAllWhenDatabaseIsEmpty(){
@@ -86,6 +107,7 @@ class PurchaseRepositoryHibernateTest {
 				 purchaseRepository.findAll(session));
 			assertThat(clients).isEmpty();
 		}
+		
 		@DisplayName("Find all when purchases are present should return the list of purchases")
 		@Test
 		void testFindAllWhenClientsArePresent(){
@@ -100,20 +122,7 @@ class PurchaseRepositoryHibernateTest {
 				);
 		}
 	}
-	
-	@Nested
-	@DisplayName("Error Cases")
-	class ErrorCases{
-		@DisplayName("Find by Id when Purchase is not present should return empty optional")
-		@Test
-		void testFindByIdWhenIsNotPresent(){
-			Optional<Purchase> found = sessionFactory.fromTransaction(session -> {
-				return purchaseRepository.findById(1,session);
-			});
-			assertThat(found).isEmpty();
-		}
-	}
-	
+
 	private List<Purchase> readAllOrdersFromDatabase() {
 		return sessionFactory.fromTransaction(
 				session -> session.createSelectionQuery("from Purchase", Purchase.class).getResultList());
