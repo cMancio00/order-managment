@@ -6,7 +6,7 @@
 
 	<groupId>order</groupId>
 	<artifactId>managment</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<name>managment</name>
 	<url>https://github.com/cMancio00/order-managment</url>
