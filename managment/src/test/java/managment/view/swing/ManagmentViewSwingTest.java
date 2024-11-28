@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.inOrder;
 import static java.time.LocalDateTime.now;
 
-import managment.controller.Managmentcontroller;
+import managment.controller.ManagmentController;
 import managment.model.Client;
 import managment.model.Purchase;
 
@@ -37,7 +37,7 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	private static final LocalDateTime TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
 
 	@Mock
-	private Managmentcontroller managmentController;
+	private ManagmentController managmentController;
 	
 	private ManagmentViewSwing managmentViewSwing;
 

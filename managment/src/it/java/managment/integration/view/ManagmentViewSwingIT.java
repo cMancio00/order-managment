@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import managment.controller.Managmentcontroller;
+import managment.controller.ManagmentController;
 import managment.model.Client;
 import managment.model.Purchase;
 import managment.repository.client.ClientRepository;
@@ -48,7 +48,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 	private ClientRepository clientRepository;
 	private PurchaseRepository purchaseRepository;
 	private PurchaseManagmentService service;
-	private Managmentcontroller controller;
+	private ManagmentController controller;
 	private ManagmentViewSwing view;
 
 	private FrameFixture window;
@@ -86,7 +86,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 
 		GuiActionRunner.execute(() -> {
 			view = new ManagmentViewSwing();
-			controller = new Managmentcontroller(view, service);
+			controller = new ManagmentController(view, service);
 			view.setManagmentController(controller);
 			return view;
 		});

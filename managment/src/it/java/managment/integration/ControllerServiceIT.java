@@ -22,7 +22,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import managment.controller.Managmentcontroller;
+import managment.controller.ManagmentController;
 import managment.model.Client;
 import managment.model.Purchase;
 import managment.repository.client.ClientRepository;
@@ -52,7 +52,7 @@ class ControllerServiceIT {
 
 	private PurchaseManagmentService service;
 	
-	private Managmentcontroller controller;
+	private ManagmentController controller;
 	
 	@Mock
 	private ManagmentView view;
@@ -75,7 +75,7 @@ class ControllerServiceIT {
 		clientRepository = new ClientRepositoryHibernate();
 		purchaseRepository = new PurchaseRepositoryHibernate();
 		service = new PurchaseManagmentService(sessionFactory, clientRepository, purchaseRepository);
-		controller = new Managmentcontroller(view, service);
+		controller = new ManagmentController(view, service);
 	}
 
 	@AfterEach

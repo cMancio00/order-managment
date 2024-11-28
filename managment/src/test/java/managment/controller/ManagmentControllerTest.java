@@ -41,7 +41,7 @@ class ManagmentControllerTest {
 	private ManagmentView view;
 	
 	@InjectMocks
-	private Managmentcontroller controller;
+	private ManagmentController controller;
 	
 	@Nested
 	@DisplayName("Happy Cases")

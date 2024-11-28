@@ -9,12 +9,12 @@ import managment.model.Purchase;
 import managment.service.PurchaseManagmentService;
 import managment.view.ManagmentView;
 
-public class Managmentcontroller {
+public class ManagmentController {
 	
 	private ManagmentView view;
 	private PurchaseManagmentService service;
 
-	public Managmentcontroller(ManagmentView view, PurchaseManagmentService service) {
+	public ManagmentController(ManagmentView view, PurchaseManagmentService service) {
 		this.view = view;
 		this.service = service;
 	}

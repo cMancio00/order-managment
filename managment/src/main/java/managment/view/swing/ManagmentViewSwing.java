@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import managment.controller.Managmentcontroller;
+import managment.controller.ManagmentController;
 import managment.model.Client;
 import managment.model.Purchase;
 import managment.view.ManagmentView;
@@ -31,7 +31,7 @@ import java.util.List;
 
 public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	
-	private transient Managmentcontroller managmentController;
+	private transient ManagmentController managmentController;
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -49,7 +49,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	private DefaultListModel<Client> listClientsModel;
 	private DefaultListModel<Purchase> listPurchaseModel;
 		
-	public void setManagmentController(Managmentcontroller managmentController) {
+	public void setManagmentController(ManagmentController managmentController) {
 		this.managmentController = managmentController;
 	}
 
