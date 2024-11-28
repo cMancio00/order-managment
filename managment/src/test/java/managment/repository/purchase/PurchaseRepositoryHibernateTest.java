@@ -70,7 +70,7 @@ class PurchaseRepositoryHibernateTest {
 	@Nested
 	@DisplayName("FindById")
 	class FindById{
-		@DisplayName("Find by id when Purchase is preset")
+		@DisplayName("When is preset should return an Optional with the purchase")
 		@Test
 		void testFindByIdWhenIsPresent(){
 			Purchase notToBeFound = new Purchase(FIRST_TEST_DATE, 10.0);
@@ -83,7 +83,7 @@ class PurchaseRepositoryHibernateTest {
 			assertThat(found).contains(new Purchase(2, SECOND_TEST_DATE, 5.0));
 		}
 		
-		@DisplayName("Find by Id when Purchase is not present should return empty optional")
+		@DisplayName("When Purchase is not present should return empty optional")
 		@Test
 		void testFindByIdWhenIsNotPresent(){
 			Optional<Purchase> found = sessionFactory.fromTransaction(session -> {
@@ -96,7 +96,7 @@ class PurchaseRepositoryHibernateTest {
 	@Nested
 	@DisplayName("Delete")
 	class DeleteTests{
-		@DisplayName("Delete Purchase when is present")
+		@DisplayName("When is present should remove it")
 		@Test
 		void testDeleteWhenClientIsPresent(){
 			Purchase notToDeleted = new Purchase(FIRST_TEST_DATE, 10.0);
@@ -126,7 +126,7 @@ class PurchaseRepositoryHibernateTest {
 	@Nested
 	@DisplayName("FindAll")
 	class FindAll{
-		@DisplayName("Find all when database is empty should return an empty list")
+		@DisplayName("When database is empty should return an empty list")
 		@Test
 		void testFindAllWhenDatabaseIsEmpty(){
 			List<Purchase> clients = sessionFactory.fromSession(session ->
@@ -134,7 +134,7 @@ class PurchaseRepositoryHibernateTest {
 			assertThat(clients).isEmpty();
 		}
 		
-		@DisplayName("Find all when purchases are present should return the list of purchases")
+		@DisplayName("When purchases are present should return the list of purchases")
 		@Test
 		void testFindAllWhenClientsArePresent(){
 			Purchase firstOrder = new Purchase(FIRST_TEST_DATE, 10.0);
