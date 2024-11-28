@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -183,7 +184,7 @@ class PurchaseManagmentServiceTest {
 			
 			@Test
 			@DisplayName("When client id is not yet set")
-			void testFindClientByIdIsNull(){
+			void testFindClientByIdWhenNotSet(){
 				// In this case id will be 0.
 				Optional<Client> foundClient = service.findClientById(new Client("aClient").getId());
 				assertThat(foundClient).isEmpty();
@@ -194,6 +195,33 @@ class PurchaseManagmentServiceTest {
 		@DisplayName("FindAll Clients")
 		class FindAllClients{
 			
+			@Test
+			@DisplayName("When are preesents should return a list of all clients")
+			void findAllClientsWhenArePresents() {
+				Client firstClient = new Client(1,"firstClient");
+				Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
+				purchase.setClient(firstClient);
+				Client secondClient = new Client(2,"secondClient");
+				when(clientRepository.findAll(any())).thenReturn(
+						asList(
+								firstClient,
+								secondClient));
+				List<Client> clients = service.findAllClients();
+				verify(clientRepository).findAll(session);
+				verify(sessionFactory, times(1)).fromTransaction(any());
+				verifyNoInteractions(purchaseRepository);
+				assertThat(clients).containsExactly(firstClient,secondClient);
+			}
+			
+			@Test
+			@DisplayName("When are not presents should return a list of all clients")
+			void findAllClientsWhenAreNotPresents() {
+				when(clientRepository.findAll(any())).thenReturn(Collections.emptyList());
+				List<Client> clients = service.findAllClients();
+				verify(clientRepository).findAll(session);
+				verify(sessionFactory, times(1)).fromTransaction(any());
+				assertThat(clients).isEmpty();
+			}
 		}
 	}
 	
