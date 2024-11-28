@@ -220,7 +220,7 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 		assertThat(window.list("purchaseList").contents()).containsExactly(notExisting.toString());
 		window.label("messageLable").requireText(notExisting.toString() + " not found");
 	}
-
+	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(
 				now().getYear(),

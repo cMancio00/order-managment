@@ -141,14 +141,18 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(btnAddNewClient, gbc_btnAddNewClient);
 		
 		btnAddAmmount = new JButton("Add Ammount");
-		btnAddAmmount.addActionListener(e -> 
-			managmentController.addPurchaseToSelectedClient(
-					listClients.getSelectedValue(),
-					new Purchase(
-							getCurrentDate(),
-							Float.parseFloat(txtPurchaseAmmount.getText())
-							))
-		);
+		btnAddAmmount.addActionListener(e -> {
+			try {
+				managmentController.addPurchaseToSelectedClient(
+						listClients.getSelectedValue(),
+						new Purchase(
+								getCurrentDate(),
+								Float.parseFloat(txtPurchaseAmmount.getText())));
+			} catch (NumberFormatException numberFormatException) {
+				messageLable.setText("Ammount must be a number");
+			}
+		});
+
 		btnAddAmmount.setEnabled(false);
 		btnAddAmmount.setName("AddAmmountButton");
 		GridBagConstraints gbc_btnAddAmmount = new GridBagConstraints();
