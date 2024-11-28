@@ -336,11 +336,11 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(
-						now().getYear(), 
-						now().getMonth(), 
-						now().getDayOfMonth(), 
-						now().getHour(), 
-						now().getHour());
+				now().getYear(),
+				now().getMonth(),
+				now().getDayOfMonth(),
+				now().getHour(),
+				now().getMinute());
 	}
 	
 }

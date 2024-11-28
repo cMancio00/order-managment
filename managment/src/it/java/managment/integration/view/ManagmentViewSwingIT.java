@@ -222,7 +222,11 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 	}
 
 	private LocalDateTime getCurrentDate() {
-		return LocalDateTime.of(now().getYear(), now().getMonth(), now().getDayOfMonth(), now().getHour(),
-				now().getHour());
+		return LocalDateTime.of(
+				now().getYear(),
+				now().getMonth(),
+				now().getDayOfMonth(),
+				now().getHour(),
+				now().getMinute());
 	}
 }
