@@ -162,9 +162,32 @@ class PurchaseManagmentServiceTest {
 		}
 		
 		@Nested
-		@DisplayName("Find Client")
+		@DisplayName("Find Client by id")
 		class FindClient{
+			@Test
+			@DisplayName("When client is present")
+			void testFindClientByIdWhenExists(){
+				Client existingClient = new Client(1,"existingClient");
+				when(clientRepository.findById(1, session)).thenReturn(Optional.of(existingClient));
+				Optional<Client> foundClient = service.findClientById(1);
+				assertThat(foundClient).contains(existingClient);
+			}
 			
+			@Test
+			@DisplayName("When client is not present")
+			void testFindClientByIdWhenDoesNotExists(){
+				when(clientRepository.findById(1, session)).thenReturn(Optional.empty());
+				Optional<Client> foundClient = service.findClientById(1);
+				assertThat(foundClient).isEmpty();
+			}
+			
+			@Test
+			@DisplayName("When client id is not yet set")
+			void testFindClientByIdIsNull(){
+				// In this case id will be 0.
+				Optional<Client> foundClient = service.findClientById(new Client("aClient").getId());
+				assertThat(foundClient).isEmpty();
+			}
 		}
 		
 		@Nested
@@ -301,22 +324,7 @@ class PurchaseManagmentServiceTest {
 			assertThat(foundPurchase).isEmpty();
 		}
 		
-		@Test
-		@DisplayName("Find client by id when client is present")
-		void testFindClientByIdWhenExists(){
-			Client existingClient = new Client(1,"existingClient");
-			when(clientRepository.findById(1, session)).thenReturn(Optional.of(existingClient));
-			Optional<Client> foundClient = service.findClientById(1);
-			assertThat(foundClient).contains(existingClient);
-		}
-		
-		@Test
-		@DisplayName("Find client by id when purchase is not present")
-		void testFindClientByIdWhenDoesNotExists(){
-			when(purchaseRepository.findById(1, session)).thenReturn(Optional.empty());
-			Optional<Client> foundClient = service.findClientById(1);
-			assertThat(foundClient).isEmpty();
-		}
+
 	}
 	
 }
