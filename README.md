@@ -53,12 +53,18 @@ will also remove the created container.
 The jar with all the dependencies can be found in the release and can now run with the following command:
 
 ```bash
-java -cp target/managment-1.0.0-jar-with-dependencies.jar managment.app.ManagmentSwingApp
+java -cp managment-1.0.0-jar-with-dependencies.jar managment.app.ManagmentSwingApp
 ```
 
 The app is using `Hibernate` and will try to connect to the `mySQL` previously started.
 
-If you don't want to use the jar you can clone the repository and in the `pom.xml` directory run the following command
+If you don't want to use the jar you can clone the repository and in the `pom.xml` directory run the following command:
+
+```bash
+mvn clean package
+```
+
+The unit tests will start and it will be created the jar, that can be run with:
 
 ```bash
 mvn exec:java -Dexec.mainClass="managment.app.ManagmentSwingApp"
