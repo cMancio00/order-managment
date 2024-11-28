@@ -21,8 +21,8 @@ public class ClientRepositoryHibernate implements ClientRepository {
 
 	@Override
 	public void delete(Client toDelete, Session session) {
-		session.remove(toDelete);
-		
+		if(toDelete != null)
+			session.remove(toDelete);
 	}
 
 	@Override
