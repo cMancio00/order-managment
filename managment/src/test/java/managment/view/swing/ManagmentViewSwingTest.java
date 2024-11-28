@@ -124,6 +124,17 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		window.button(JButtonMatcher.withText("Add Ammount")).requireEnabled();
 
 	}
+	
+	@Test
+	public void testWhenPurchaseAmmountIsNotANumberShouldReportError() {
+		GuiActionRunner.execute(() -> managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
+		window.list("clientList").selectItem(0);
+
+		window.textBox("purchaseAmmountBox").enterText("notValidAmmount");
+		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		window.label("messageLable").requireText("Ammount must be a number");
+		
+	}
 
 	@Test
 	public void testDeletePurchaseButtonShouldBeDisabledWhenAClientAndAPurchaseIsNotSelected() {
@@ -333,6 +344,7 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		InOrder inOrder = inOrder(managmentController);
 		inOrder.verify(managmentController).remove(toRemove);
 	}
+	
 	
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(

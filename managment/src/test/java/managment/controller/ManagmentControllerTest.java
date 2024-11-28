@@ -150,7 +150,26 @@ class ManagmentControllerTest {
 			inOrder.verify(service).deletePurchase(toDelete);
 			inOrder.verify(view).purchaseRemoved(toDelete);
 		}
-		
+		@Test
+		@DisplayName("When exists (multiple times)")
+		void testRemoveMultiplePurchaseWhenExists(){
+			Purchase toDelete = new Purchase(1, TEST_DATE, 5.0);
+			when(service.findPurchaseById(1)).thenReturn(Optional.of(toDelete));
+			
+			controller.remove(toDelete);
+			InOrder inOrder = inOrder(service,view);
+			inOrder.verify(service).findPurchaseById(1);
+			inOrder.verify(service).deletePurchase(toDelete);
+			inOrder.verify(view).purchaseRemoved(toDelete);
+			
+			Purchase anOtherToDelete = new Purchase(2, TEST_DATE, 10.0);
+			when(service.findPurchaseById(2)).thenReturn(Optional.of(anOtherToDelete));
+			
+			controller.remove(anOtherToDelete);
+			inOrder.verify(service).findPurchaseById(2);
+			inOrder.verify(service).deletePurchase(anOtherToDelete);
+			inOrder.verify(view).purchaseRemoved(anOtherToDelete);
+		}
 		@Test
 		@DisplayName("When purchase do not exists")
 		void testRemovePurchaseWhenPurchaseDoNotExists(){

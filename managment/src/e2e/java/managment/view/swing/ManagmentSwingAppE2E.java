@@ -154,6 +154,18 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 		assertThat(window.label("messageLable").text()).contains("10.0", "not found");
 	}
 	
+	@Test
+	@GUITest
+	public void testDeletePurchaseButtonSuccessMultipleTimes() {
+		window.list("clientList").selectItem(Pattern.compile(".*" + "aClient" + ".*"));
+		window.list("purchaseList").selectItem(Pattern.compile(".*" + "10.0" + ".*"));
+		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
+		assertThat(window.list("purchaseList").contents()).noneMatch(e -> e.contains("10.0"));
+		window.list("purchaseList").selectItem(Pattern.compile(".*" + "5.0" + ".*"));
+		window.button(JButtonMatcher.withText("Delete Selected Purchase")).click();
+		assertThat(window.list("purchaseList").contents()).noneMatch(e -> e.contains("5.0"));
+	}
+	
 
 	private LocalDateTime getCurrentDate() {
 		return LocalDateTime.of(

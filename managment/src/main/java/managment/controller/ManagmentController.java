@@ -61,7 +61,7 @@ public class ManagmentController {
 	}
 
 	public void remove(Purchase toDelete) {
-		Optional<Purchase> foundPurchase = service.findPurchaseById(1);
+		Optional<Purchase> foundPurchase = service.findPurchaseById(toDelete.getId());
 		foundPurchase.ifPresentOrElse(purchase -> {
 			service.deletePurchase(toDelete);
 			view.purchaseRemoved(toDelete);
