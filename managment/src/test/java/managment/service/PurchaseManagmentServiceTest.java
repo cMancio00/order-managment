@@ -125,7 +125,7 @@ class PurchaseManagmentServiceTest {
 			}
 			
 			@Test
-			@DisplayName("Should delete the client")
+			@DisplayName("Should delete the client with no purchases without interacting with the purchase repository")
 			void testDeleteClientShouldDeleteTheClient(){
 				Optional<Client> toDelete = Optional.of(new Client(1,"toDelete"));
 				when(clientRepository.findById(eq(1), any()))
