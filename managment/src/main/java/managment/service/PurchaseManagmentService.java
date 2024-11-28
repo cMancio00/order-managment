@@ -36,6 +36,8 @@ public class PurchaseManagmentService {
 	}
 
 	public Client addClient(Client client) {
+		if(client == null)
+			throw new IllegalArgumentException("Can't add a null Object");
 		return sessionFactory.fromTransaction(session -> clientRepository.save(client, session));
 	}
 

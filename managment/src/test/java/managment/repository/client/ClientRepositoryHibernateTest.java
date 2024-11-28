@@ -49,7 +49,7 @@ class ClientRepositoryHibernateTest {
 			assertThat(toAdd.getId()).isEqualTo(1);
 		}
 		
-		@DisplayName("When database is not empy")
+		@DisplayName("When database is not empty")
 		@Test
 		void testSaveNotEmpty(){
 			addClientToDatabase("existingClient");

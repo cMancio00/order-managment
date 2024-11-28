@@ -1,7 +1,7 @@
 package managment.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -80,8 +80,36 @@ class PurchaseManagmentServiceTest {
 	}
 
 	@Nested
-	@DisplayName("CRUD methods")
-	class CrudMethods {
+	@DisplayName("Add Client")
+	class AddClient{
+		
+		@Test
+		@DisplayName("When Client is not null")
+		void testAddClientWhenDatabaseIsEmpty(){
+			Client aClient = new Client("aClient");
+			when(clientRepository.save(eq(aClient), any())).thenReturn(new Client(1, "aClient"));
+			Client added = service.addClient(aClient);
+			assertThat(added).isNotNull();
+			verify(clientRepository).save(aClient, session);
+			verify(sessionFactory, times(1)).fromTransaction(any());
+			verifyNoMoreInteractions(clientRepository);
+			verifyNoInteractions(purchaseRepository);
+		}
+		
+		@Test
+		@DisplayName("When Client is null should be no interactions")
+		void testAddClientWhenClientIsNull(){
+			IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+					() -> service.addClient(null));
+			assertThat(e.getMessage()).isEqualTo("Can't add a null Object");
+			verifyNoInteractions(clientRepository);
+			verifyNoInteractions(purchaseRepository);
+		}
+	}
+	
+	@Nested
+	@DisplayName("Add Purchase")
+	class AddPurchase{
 		@Test
 		@DisplayName("Add Purchase should respect relational constraints")
 		void testAddPurchaseShouldRespectRelationalConstraints() {
@@ -124,21 +152,15 @@ class PurchaseManagmentServiceTest {
 					);
 			assertThat(addedPurchase.getClient().getId()).isEqualTo(1);
 		}
+	}
+	
+	@Nested
+	@DisplayName("CRUD methods")
+	class CrudMethods {
 		
 		
-		@Test
-		@DisplayName("Add Client")
-		void testAddClient(){
-			Client client = new Client("testClient");
-			when(clientRepository.save(eq(client), any())).thenReturn(new Client(1, "testClient"));
-			Client addedClient = service.addClient(client);
-			assertNotNull(addedClient);
-			verify(clientRepository).save(client, session);
-			verify(sessionFactory, times(1)).fromTransaction(any());
-			verifyNoMoreInteractions(clientRepository);
-			verifyNoInteractions(purchaseRepository);
-			assertThat(addedClient.getId()).isEqualTo(1);
-		}
+		
+
 		
 		@Test
 		@DisplayName("Delete Purchase")
@@ -257,5 +279,4 @@ class PurchaseManagmentServiceTest {
 		}
 	}
 	
-
 }
