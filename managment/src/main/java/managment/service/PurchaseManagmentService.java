@@ -42,12 +42,15 @@ public class PurchaseManagmentService {
 	}
 
 	public void deletePurchase(Purchase toDelete) {
+		if(toDelete.getClient() == null)
+			throw new IllegalArgumentException("Purchase has no Client");
 		sessionFactory.inTransaction(session -> {
 			Optional<Client> foundClient = clientRepository.findById(toDelete.getClient().getId(), session);
 			foundClient.ifPresent(client ->{
-				client.getPurchases().remove(toDelete);
-				purchaseRepository.delete(toDelete, session);
-				clientRepository.save(client, session);
+				if(client.getPurchases().remove(toDelete)) {
+					purchaseRepository.delete(toDelete, session);
+					clientRepository.save(client, session);
+				}	
 			});
 		});
 		

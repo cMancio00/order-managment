@@ -196,7 +196,7 @@ class PurchaseManagmentServiceTest {
 		class FindAllClients{
 			
 			@Test
-			@DisplayName("When are preesents should return a list of all clients")
+			@DisplayName("When are presents should return a list of all clients")
 			void findAllClientsWhenArePresents() {
 				Client firstClient = new Client(1,"firstClient");
 				Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
@@ -220,89 +220,119 @@ class PurchaseManagmentServiceTest {
 				List<Client> clients = service.findAllClients();
 				verify(clientRepository).findAll(session);
 				verify(sessionFactory, times(1)).fromTransaction(any());
+				verifyNoInteractions(purchaseRepository);
 				assertThat(clients).isEmpty();
 			}
 		}
 	}
 	
-	
-	
 	@Nested
-	@DisplayName("Add Purchase")
-	class AddPurchase{
-		@Test
-		@DisplayName("Add Purchase should respect relational constraints")
-		void testAddPurchaseShouldRespectRelationalConstraints() {
-			Client client = new Client(1, "testClient");
-			Purchase existingPurchase = new Purchase(1, FIRST_TEST_DATE, 10.0);
-			existingPurchase.setClient(client);
-			Purchase purchase = new Purchase(SECOND_TEST_DATE, 5.0);
-			client.setPurchases(new ArrayList<Purchase>(asList(existingPurchase)));
+	@DisplayName("Purchase")
+	class PurchaseCRUD {
+		@Nested
+		@DisplayName("Add Purchase")
+		class AddPurchase{
+			@Test
+			@DisplayName("Add Purchase should respect relational constraints")
+			void testAddPurchaseShouldRespectRelationalConstraints() {
+				Client client = new Client(1, "testClient");
+				Purchase existingPurchase = new Purchase(1, FIRST_TEST_DATE, 10.0);
+				existingPurchase.setClient(client);
+				Purchase purchase = new Purchase(SECOND_TEST_DATE, 5.0);
+				client.setPurchases(new ArrayList<Purchase>(asList(existingPurchase)));
+				
+				when(purchaseRepository.save(eq(purchase), any()))
+					.thenReturn(new Purchase(2, SECOND_TEST_DATE, 5.0));
+				
+				Purchase addedPurchase = service.addPurchaseToClient(client, purchase);
+				verify(purchaseRepository).save(eq(purchase), any());
+				verify(sessionFactory, times(1)).fromTransaction(any());
+				
+				assertThat(client.getPurchases()).containsExactly(
+						existingPurchase,
+						new Purchase(2, SECOND_TEST_DATE, 5.0));
+				assertThat(addedPurchase.getClient()).isEqualTo(client);
+			}
 			
-			when(purchaseRepository.save(eq(purchase), any()))
-				.thenReturn(new Purchase(2, SECOND_TEST_DATE, 5.0));
-			
-			Purchase addedPurchase = service.addPurchaseToClient(client, purchase);
-			verify(purchaseRepository).save(eq(purchase), any());
-			verify(sessionFactory, times(1)).fromTransaction(any());
-			
-			assertThat(client.getPurchases()).containsExactly(
-					existingPurchase,
-					new Purchase(2, SECOND_TEST_DATE, 5.0));
-			assertThat(addedPurchase.getClient()).isEqualTo(client);
+			@Test
+			@DisplayName("Add Purchase on new Client should aslo create the list of purchases")
+			void testAddPurchaseOnNewClient() {
+				Client client = new Client(1,"testClient");
+				Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
+		
+				when(purchaseRepository.save(eq(purchase), any()))
+					.thenReturn(new Purchase(1, FIRST_TEST_DATE, 10.0));
+				
+				Purchase addedPurchase = service.addPurchaseToClient(client, purchase);
+				
+				verify(purchaseRepository)
+					.save(eq(purchase), any());
+
+				verify(sessionFactory, times(1)).fromTransaction(any());
+				assertThat(client.getPurchases()).containsExactly(
+						new Purchase(1, FIRST_TEST_DATE, 10.0)
+						);
+				assertThat(addedPurchase.getClient().getId()).isEqualTo(1);
+			}
 		}
 		
-		@Test
-		@DisplayName("Add Purchase on new Client should aslo create the list of purchases")
-		void testAddPurchaseOnNewClient() {
-			Client client = new Client(1,"testClient");
-			Purchase purchase = new Purchase(FIRST_TEST_DATE, 10.0);
-	
-			when(purchaseRepository.save(eq(purchase), any()))
-				.thenReturn(new Purchase(1, FIRST_TEST_DATE, 10.0));
-			
-			Purchase addedPurchase = service.addPurchaseToClient(client, purchase);
-			
-			verify(purchaseRepository)
-				.save(eq(purchase), any());
-
-			verify(sessionFactory, times(1)).fromTransaction(any());
-			assertThat(client.getPurchases()).containsExactly(
-					new Purchase(1, FIRST_TEST_DATE, 10.0)
-					);
-			assertThat(addedPurchase.getClient().getId()).isEqualTo(1);
-		}
-	}
-	
-	@Nested
-	@DisplayName("CRUD methods")
-	class CrudMethods {
-		
-		
-		
-
-		
-		@Test
+		@Nested
 		@DisplayName("Delete Purchase")
-		void testDeletePurchase(){
-			Client client = new Client(1,"testClient");
-			Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
-			purchase.setClient(client);
-			Purchase toDelete = new Purchase(2,SECOND_TEST_DATE, 5.0);
-			toDelete.setClient(client);
-			client.setPurchases(new ArrayList<Purchase>(Arrays.asList(purchase,toDelete)));
+		class DeletePurcahse{
 			
-			when(clientRepository.findById(eq(1), any())).thenReturn(Optional.of(client));
-			service.deletePurchase(toDelete);
-			InOrder inOrder = inOrder(clientRepository, purchaseRepository);
-			inOrder.verify(purchaseRepository).delete(eq(toDelete), any());
-			inOrder.verify(clientRepository).save(eq(client), any());
-			verify(sessionFactory, times(1)).inTransaction(any());
-			assertThat(client.getPurchases()).containsExactly(purchase);
+			@Test
+			@DisplayName("When is present")
+			void testDeletePurchaseWhenIsPresent(){
+				Client client = new Client(1,"testClient");
+				Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
+				purchase.setClient(client);
+				Purchase toDelete = new Purchase(2,SECOND_TEST_DATE, 5.0);
+				toDelete.setClient(client);
+				client.setPurchases(new ArrayList<Purchase>(Arrays.asList(purchase,toDelete)));
+				
+				when(clientRepository.findById(eq(1), any())).thenReturn(Optional.of(client));
+				service.deletePurchase(toDelete);
+				InOrder inOrder = inOrder(clientRepository, purchaseRepository);
+				inOrder.verify(purchaseRepository).delete(eq(toDelete), any());
+				inOrder.verify(clientRepository).save(eq(client), any());
+				verify(sessionFactory, times(1)).inTransaction(any());
+				assertThat(client.getPurchases()).containsExactly(purchase);
+			}
+			
+			@Test
+			@DisplayName("When is not present in client purchases")
+			void testDeletePurchaseWhenIsNotPresent(){
+				Client client = new Client(1,"testClient");
+				Purchase purchase = new Purchase(1,FIRST_TEST_DATE, 10.0);
+				purchase.setClient(client);
+				client.setPurchases(new ArrayList<Purchase>(Arrays.asList(purchase)));
+				
+				Purchase toDelete = new Purchase(SECOND_TEST_DATE, 5.0);
+				toDelete.setClient(client);
+				
+				when(clientRepository.findById(eq(1), any())).thenReturn(Optional.of(client));
+				service.deletePurchase(toDelete);
+				verifyNoMoreInteractions(ignoreStubs(clientRepository));
+				verifyNoInteractions(purchaseRepository);
+				verify(sessionFactory, times(1)).inTransaction(any());
+				assertThat(client.getPurchases()).containsExactly(purchase);
+			}
+			
+			@Test
+			@DisplayName("When it has no client")
+			void testDeletePurchaseWhenItHasNoClient(){
+				Purchase toDelete = new Purchase(SECOND_TEST_DATE, 5.0);
+				IllegalArgumentException e = 
+						assertThrows(IllegalArgumentException.class, 
+							() -> service.deletePurchase(toDelete));
+				assertThat(e.getMessage()).isEqualTo("Purchase has no Client");
+				verifyNoInteractions(clientRepository);
+				verifyNoInteractions(purchaseRepository);
+				verifyNoInteractions(sessionFactory);
+			}
+			
 		}
-		
 
-		
 		@Test
 		@DisplayName("Find all Clients should return a list of all clients")
 		void findAllClients() {
