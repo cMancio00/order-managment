@@ -1,3 +1,4 @@
 /target/
 pitHistory
 failed-gui-tests/
+.mvn/wrapper/maven-wrapper.jar
