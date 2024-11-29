@@ -72,6 +72,7 @@
 		<assertj-swing.version>3.17.1</assertj-swing.version>
 		<picocli.version>4.6.1</picocli.version>
 		<log4j.version>2.24.1</log4j.version>
+		<exec.version>3.5.0</exec.version>
 
 	</properties>
 
@@ -351,12 +352,23 @@
 							</descriptorRefs>
 							<archive>
 								<manifest>
-									<mainClass>managment.app.ManagmentSwingApp.main</mainClass>
+									<mainClass>
+										managment.app.ManagmentSwingApp
+									</mainClass>
+									<addClasspath>true</addClasspath>
 								</manifest>
 							</archive>
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>${exec.version}</version>
+				<configuration>
+					<mainClass>managment.app.ManagmentSwingApp</mainClass>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
