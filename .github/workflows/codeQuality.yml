@@ -44,11 +44,11 @@ jobs:
 
       - name: Build with Maven
         run: |
-            xvfb-run mvn clean verify -Pjacoco,mutation-testing
+            xvfb-run ./mvnw clean verify -Pjacoco,mutation-testing
         working-directory: ${{ env.workdir }}
 
       - name: Generate JUnit Report
-        run: mvn surefire-report:report-only surefire-report:failsafe-report-only site:site -DgenerateReports=false
+        run: ./mvnw surefire-report:report-only surefire-report:failsafe-report-only site:site -DgenerateReports=false
         working-directory: ${{ env.workdir }}
         if: ${{ always() }}
       - name: Archive JUnit Report
@@ -64,7 +64,7 @@ jobs:
          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: SonarCloud
-        run: mvn sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+        run: ./mvnw sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         working-directory: ${{ env.workdir }}
 
       - name: Archive mutation report
