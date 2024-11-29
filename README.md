@@ -17,13 +17,28 @@ Mutation report can be found [here](https://cmancio00.github.io/order-managment/
 
 ![PurchaseManagerView](/pictures/PurchaseManagerView.png "Purchase Manager View")
 
-To run the application needs a `mySQL` database connection. It is advised to use the following `docker-compose.yml` that you can find [here](/managment/docker-compose.yml)
+This Java application is designed to manage orders using a `MySQL` database. It can be run in two main ways: via **JAR** and the **Docker Compose** or with **Maven**.
+
+## Requiremets
+
+- **Java 11** or later.
+- A running `MySQL` database.
+
+> [!NOTE]
+> **Maven** is not required, as the project includes a Maven Wrapper (`mvnw`) version `3.9.9`.
+
+## Running The Application
+
+### 1. Using Docker Compose and the Jar
+
+You can set up and run a `MySQL` instance using the provided `docker-compose.yml` file,
+available [here](/managment/docker-compose.yml):
+
 ```yml
 services:
   db:
     image: mysql:9.1.0
     container_name: orderManagment
-    restart: unless-stopped
     ports:
       - "3306:3306"
     environment:
@@ -31,64 +46,98 @@ services:
       MYSQL_DATABASE: managment
       MYSQL_USER: order-manager
       MYSQL_PASSWORD: mysecret
+    volumes:
+      - ./mysql:/var/lib/mysql
 ```
-The command:
+Useful commands
+
+- Start the container
 ```bash
 docker compose up -d
 ```
-will start the container and
+- Stop the container
 ```bash
 docker compose down
 ```
-will stop the container.
-Using
+- Remove the container:
+
 ```bash
 docker compose down -v
 ```
-will also remove the created container and volumes.
 
 > [!NOTE]
-> You must run the `docker compose` command in the same directory of the file `docker-compose.yml`.
+> Ensure you run the commands in the same directory as the `docker-compose.yml` file.
 
-The jar with all the dependencies can be found in the release and can now run with the following command:
+Data will be stored in a folder named `mysql`, which serves as the container's volume.
 
-```bash
-java -cp managment-1.0.0-jar-with-dependencies.jar managment.app.ManagmentSwingApp
-```
+The JAR file with all dependencies included is available in the [Releases](https://github.com/cMancio00/order-managment/releases) section.
 
-The app is using `Hibernate` and will try to connect to the `mySQL` previously started.
-
-If you don't want to use the jar you can clone the repository and in the `pom.xml` directory run the following command:
+You can execute it with:
 
 ```bash
-mvn clean package
+java -jar managment-1.1.0-jar-with-dependencies.jar
 ```
 
-The unit tests will start and it will be created the jar, that can be run with:
+The application uses `Hibernate` to connect to the `MySQL` database.
+
+### 2.Running via Maven
+
+**Build the Application**
+
+Clone the repository and, in the directory containing the pom.xml file, run:
 
 ```bash
-mvn exec:java -Dexec.mainClass="managment.app.ManagmentSwingApp"
+./mvnw clean package
 ```
+This command will run unit tests and generate the application JAR.
 
-Assuming you have `Maven` and at least `Java 11` installed.
+**Starting the Database with Maven**
 
-> [!WARNING]
-> The container must be starded even when using maven
-
-If you are interest in running all the tests with `code coverage` report and `mutation testing` you can run:
+You can start the `MySQL` container using Maven with:
 
 ```bash
-mvn clean verify -Pjacoco,mutation-testing
+./mvnw docker:start
 ```
+The data will be stored in a folder called `mysql` which is the volume of the container.
 
-The code coverage report will be in `target/site/jacoco/index.html`.
+**Running the Application**
 
-The mutation report will be in `target/pit-reports/index.html`.
-
-The `surefire` and `failsafe` reports (i.e unit test and IT and E2E test report) can be generated with:
+Start the application with:
 
 ```bash
-mvn surefire-report:report-only surefire-report:failsafe-report-only site:site -DgenerateReports=false
+./mvnw exec:java
+```
+**Stopping the Database**
+
+When you're done, stop the container with:
+
+```bash
+./mvnw docker:stop
+```
+## Testing and Reports
+
+### Running Tests with Coverage and Mutation Testing
+
+To run all tests, including code coverage and mutation testing, execute:
+
+```bash
+./mvnw clean verify -Pjacoco,mutation-testing
+```
+Reports will be generated in the following locations:
+
+- **Code coverage**: `target/site/jacoco/index.html`.
+
+- **Mutation report**: `target/pit-reports/index.html`.
+
+### Generating Test Reports
+
+To generate `Surefire` (unit tests) and `Failsafe` (IT and E2E tests) reports:
+
+```bash
+./mvnw surefire-report:report-only surefire-report:failsafe-report-only site:site -DgenerateReports=false
 ```
 
-Reports will be stored in `target/reports/surefire.html` and `target/reports/failsafe.html`
+The reports will be available at:
+
+- **Surefire**: `target/reports/surefire.html`
+- **Failsafe**: `target/reports/failsafe.html`
