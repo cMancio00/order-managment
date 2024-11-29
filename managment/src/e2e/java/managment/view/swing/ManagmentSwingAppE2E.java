@@ -130,8 +130,8 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testAddPurchaseSuccess() {
 		window.list("clientList").selectItem(Pattern.compile(".*" + "otherClient" + ".*"));
-		window.textBox("purchaseAmmountBox").enterText("15.0");
-		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		window.textBox("purchaseAmountBox").enterText("15.0");
+		window.button(JButtonMatcher.withText("Add Amount")).click();
 		assertThat(window.list("purchaseList").contents()).anySatisfy(e -> assertThat(e).contains("15.0"));
 	}
 	

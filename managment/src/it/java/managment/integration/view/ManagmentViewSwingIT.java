@@ -183,8 +183,8 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 
 		window.list("clientList").selectItem(0);
 
-		window.textBox("purchaseAmmountBox").enterText("10.0");
-		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		window.textBox("purchaseAmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Amount")).click();
 		assertThat(window.list("purchaseList").contents())
 				.containsExactly(new Purchase(1, getCurrentDate(), 10.0).toString());
 
