@@ -41,8 +41,8 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 	@ClassRule
 	@SuppressWarnings({ "rawtypes", "resource" })
 	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(
-			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("e2e-db").withUsername("manager")
-			.withPassword("e2e").withReuse(true);
+			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("test-db").withUsername("manager")
+			.withPassword("test");
 
 	private static SessionFactory sessionFactory;
 	private ClientRepository clientRepository;
@@ -130,8 +130,8 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 	@GUITest
 	public void testAddPurchaseSuccess() {
 		window.list("clientList").selectItem(Pattern.compile(".*" + "otherClient" + ".*"));
-		window.textBox("purchaseAmmountBox").enterText("15.0");
-		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		window.textBox("purchaseAmountBox").enterText("15.0");
+		window.button(JButtonMatcher.withText("Add Amount")).click();
 		assertThat(window.list("purchaseList").contents()).anySatisfy(e -> assertThat(e).contains("15.0"));
 	}
 	

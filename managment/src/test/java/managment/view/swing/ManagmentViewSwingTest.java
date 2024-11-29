@@ -67,11 +67,11 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	public void testControlsInitialStates() {
 		window.label(JLabelMatcher.withText("Client Name"));
 		window.textBox("clientNameBox").requireEnabled();
-		window.label(JLabelMatcher.withText("Purchase Ammount"));
-		window.textBox("purchaseAmmountBox").requireEnabled();
+		window.label(JLabelMatcher.withText("Purchase Amount"));
+		window.textBox("purchaseAmountBox").requireEnabled();
 
 		window.button(JButtonMatcher.withText("Add New Client")).requireDisabled();
-		window.button(JButtonMatcher.withText("Add Ammount")).requireDisabled();
+		window.button(JButtonMatcher.withText("Add Amount")).requireDisabled();
 
 		window.list("clientList");
 		window.list("purchaseList");
@@ -103,36 +103,36 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 	}
 
 	@Test
-	public void testWhenPurchaseAmmountIsNonEmptyAndClientIsSelectedThenAddPurchaseButtonShouldBeEnabled() {
+	public void testWhenPurchaseAmountIsNonEmptyAndClientIsSelectedThenAddPurchaseButtonShouldBeEnabled() {
 		GuiActionRunner.execute(() -> managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
 		window.list("clientList").selectItem(0);
 
-		window.textBox("purchaseAmmountBox").enterText("10.0");
-		window.button(JButtonMatcher.withText("Add Ammount")).requireEnabled();
+		window.textBox("purchaseAmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Amount")).requireEnabled();
 
-		window.textBox("purchaseAmmountBox").setText("");
-		window.textBox("purchaseAmmountBox").enterText(" ");
-		window.button(JButtonMatcher.withText("Add Ammount")).requireDisabled();
+		window.textBox("purchaseAmountBox").setText("");
+		window.textBox("purchaseAmountBox").enterText(" ");
+		window.button(JButtonMatcher.withText("Add Amount")).requireDisabled();
 
 		window.list("clientList").clearSelection();
-		window.button(JButtonMatcher.withText("Add Ammount")).requireDisabled();
+		window.button(JButtonMatcher.withText("Add Amount")).requireDisabled();
 
-		window.textBox("purchaseAmmountBox").enterText("10.0");
-		window.button(JButtonMatcher.withText("Add Ammount")).requireDisabled();
+		window.textBox("purchaseAmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Amount")).requireDisabled();
 
 		window.list("clientList").selectItem(0);
-		window.button(JButtonMatcher.withText("Add Ammount")).requireEnabled();
+		window.button(JButtonMatcher.withText("Add Amount")).requireEnabled();
 
 	}
 	
 	@Test
-	public void testWhenPurchaseAmmountIsNotANumberShouldReportError() {
+	public void testWhenPurchaseAmountIsNotANumberShouldReportError() {
 		GuiActionRunner.execute(() -> managmentViewSwing.getListClientsModel().addElement(new Client(1, "testClient")));
 		window.list("clientList").selectItem(0);
 
-		window.textBox("purchaseAmmountBox").enterText("notValidAmmount");
-		window.button(JButtonMatcher.withText("Add Ammount")).click();
-		window.label("messageLable").requireText("Ammount must be a number");
+		window.textBox("purchaseAmountBox").enterText("notValidAmount");
+		window.button(JButtonMatcher.withText("Add Amount")).click();
+		window.label("messageLable").requireText("Amount must be a number");
 		
 	}
 
@@ -318,8 +318,8 @@ public class ManagmentViewSwingTest extends AssertJSwingJUnitTestCase {
 		});
 
 		window.list("clientList").selectItem(0);
-		window.textBox("purchaseAmmountBox").enterText("10.0");
-		window.button(JButtonMatcher.withText("Add Ammount")).click();		
+		window.textBox("purchaseAmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Amount")).click();		
 		verify(managmentController).addPurchaseToSelectedClient(client,
 				new Purchase(getCurrentDate(), 10.0));
 		verify(managmentController).findAllPurchasesOf(client);

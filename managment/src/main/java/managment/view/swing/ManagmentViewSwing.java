@@ -36,10 +36,10 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtClientName;
-	private JLabel lblPurchaseAmmount;
-	private JTextField txtPurchaseAmmount;
+	private JLabel lblPurchaseAmount;
+	private JTextField txtPurchaseAmount;
 	private JButton btnAddNewClient;
-	private JButton btnAddAmmount;
+	private JButton btnAddAmount;
 	private JList<Client> listClients;
 	private JList<Purchase> listPurchases;
 	private JButton btnDeleteSelectedClient;
@@ -103,29 +103,29 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		contentPane.add(txtClientName, gbc_txtClientName);
 		txtClientName.setColumns(10);
 		
-		lblPurchaseAmmount = new JLabel("Purchase Ammount");
-		lblPurchaseAmmount.setName("purchaseAmmountLable");
-		GridBagConstraints gbc_lblPurchaseAmmount = new GridBagConstraints();
-		gbc_lblPurchaseAmmount.insets = new Insets(0, 0, 5, 5);
-		gbc_lblPurchaseAmmount.gridx = 3;
-		gbc_lblPurchaseAmmount.gridy = 1;
-		contentPane.add(lblPurchaseAmmount, gbc_lblPurchaseAmmount);
+		lblPurchaseAmount = new JLabel("Purchase Amount");
+		lblPurchaseAmount.setName("purchaseAmountLable");
+		GridBagConstraints gbc_lblPurchaseAmount = new GridBagConstraints();
+		gbc_lblPurchaseAmount.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPurchaseAmount.gridx = 3;
+		gbc_lblPurchaseAmount.gridy = 1;
+		contentPane.add(lblPurchaseAmount, gbc_lblPurchaseAmount);
 		
-		txtPurchaseAmmount = new JTextField();
-		txtPurchaseAmmount.addKeyListener(new KeyAdapter() {
+		txtPurchaseAmount = new JTextField();
+		txtPurchaseAmount.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				btnAddAmmountEnabler();
+				btnAddAmountEnabler();
 			}
 		});
-		txtPurchaseAmmount.setName("purchaseAmmountBox");
-		GridBagConstraints gbc_txtPurchaseAmmount = new GridBagConstraints();
-		gbc_txtPurchaseAmmount.insets = new Insets(0, 0, 5, 0);
-		gbc_txtPurchaseAmmount.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtPurchaseAmmount.gridx = 4;
-		gbc_txtPurchaseAmmount.gridy = 1;
-		contentPane.add(txtPurchaseAmmount, gbc_txtPurchaseAmmount);
-		txtPurchaseAmmount.setColumns(10);
+		txtPurchaseAmount.setName("purchaseAmountBox");
+		GridBagConstraints gbc_txtPurchaseAmount = new GridBagConstraints();
+		gbc_txtPurchaseAmount.insets = new Insets(0, 0, 5, 0);
+		gbc_txtPurchaseAmount.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtPurchaseAmount.gridx = 4;
+		gbc_txtPurchaseAmount.gridy = 1;
+		contentPane.add(txtPurchaseAmount, gbc_txtPurchaseAmount);
+		txtPurchaseAmount.setColumns(10);
 		
 		btnAddNewClient = new JButton("Add New Client");
 		btnAddNewClient.addActionListener(e ->
@@ -140,27 +140,27 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		gbc_btnAddNewClient.gridy = 2;
 		contentPane.add(btnAddNewClient, gbc_btnAddNewClient);
 		
-		btnAddAmmount = new JButton("Add Ammount");
-		btnAddAmmount.addActionListener(e -> {
+		btnAddAmount = new JButton("Add Amount");
+		btnAddAmount.addActionListener(e -> {
 			try {
 				managmentController.addPurchaseToSelectedClient(
 						listClients.getSelectedValue(),
 						new Purchase(
 								getCurrentDate(),
-								Float.parseFloat(txtPurchaseAmmount.getText())));
+								Float.parseFloat(txtPurchaseAmount.getText())));
 			} catch (NumberFormatException numberFormatException) {
-				messageLable.setText("Ammount must be a number");
+				messageLable.setText("Amount must be a number");
 			}
 		});
 
-		btnAddAmmount.setEnabled(false);
-		btnAddAmmount.setName("AddAmmountButton");
-		GridBagConstraints gbc_btnAddAmmount = new GridBagConstraints();
-		gbc_btnAddAmmount.insets = new Insets(0, 0, 5, 0);
-		gbc_btnAddAmmount.gridwidth = 2;
-		gbc_btnAddAmmount.gridx = 3;
-		gbc_btnAddAmmount.gridy = 2;
-		contentPane.add(btnAddAmmount, gbc_btnAddAmmount);
+		btnAddAmount.setEnabled(false);
+		btnAddAmount.setName("AddAmountButton");
+		GridBagConstraints gbc_btnAddAmount = new GridBagConstraints();
+		gbc_btnAddAmount.insets = new Insets(0, 0, 5, 0);
+		gbc_btnAddAmount.gridwidth = 2;
+		gbc_btnAddAmount.gridx = 3;
+		gbc_btnAddAmount.gridy = 2;
+		contentPane.add(btnAddAmount, gbc_btnAddAmount);
 		
 		listClientsModel = new DefaultListModel<>();
 		listClients = new JList<>(listClientsModel);
@@ -170,7 +170,7 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 				managmentController.findAllPurchasesOf(listClients.getSelectedValue());
 			btnDeleteSelectedClientEnabler();
 			btnDeleteSelectedPurchaseEnabler();
-			btnAddAmmountEnabler();
+			btnAddAmountEnabler();
 			
 		});
 		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -241,9 +241,9 @@ public class ManagmentViewSwing extends JFrame implements ManagmentView{
 		btnDeleteSelectedClient.setEnabled(listClients.getSelectedIndex() != -1);
 	}
 	
-	private void btnAddAmmountEnabler() {
-		btnAddAmmount.setEnabled(
-				!txtPurchaseAmmount.getText().trim().isEmpty() &&
+	private void btnAddAmountEnabler() {
+		btnAddAmount.setEnabled(
+				!txtPurchaseAmount.getText().trim().isEmpty() &&
 				listClients.getSelectedIndex() != -1
 				);
 	}

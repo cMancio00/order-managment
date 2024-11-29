@@ -39,7 +39,7 @@ class ServiceRepositoryIT {
 
 	@SuppressWarnings({ "rawtypes", "resource" })
 	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
-			.withDatabaseName("Service-Repository-db").withUsername("manager").withPassword("it").withReuse(true);
+			.withDatabaseName("test-db").withUsername("manager").withPassword("test");
 
 	private static final LocalDateTime FIRST_TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
 	private static final LocalDateTime SECOND_TEST_DATE = LocalDate.of(2024, Month.FEBRUARY, 1).atStartOfDay();

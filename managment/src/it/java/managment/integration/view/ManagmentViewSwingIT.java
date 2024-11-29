@@ -41,8 +41,8 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 	@ClassRule
 	@SuppressWarnings({ "rawtypes", "resource" })
 	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(
-			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("ViewIT-db").withUsername("manager")
-			.withPassword("it").withReuse(true);
+			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("test-db").withUsername("manager")
+			.withPassword("test");
 
 	private static SessionFactory sessionFactory;
 	private ClientRepository clientRepository;
@@ -183,8 +183,8 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 
 		window.list("clientList").selectItem(0);
 
-		window.textBox("purchaseAmmountBox").enterText("10.0");
-		window.button(JButtonMatcher.withText("Add Ammount")).click();
+		window.textBox("purchaseAmountBox").enterText("10.0");
+		window.button(JButtonMatcher.withText("Add Amount")).click();
 		assertThat(window.list("purchaseList").contents())
 				.containsExactly(new Purchase(1, getCurrentDate(), 10.0).toString());
 

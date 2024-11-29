@@ -6,7 +6,7 @@
 
 	<groupId>order</groupId>
 	<artifactId>managment</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 
 	<name>managment</name>
 	<url>https://github.com/cMancio00/order-managment</url>
@@ -72,14 +72,9 @@
 		<assertj-swing.version>3.17.1</assertj-swing.version>
 		<picocli.version>4.6.1</picocli.version>
 		<log4j.version>2.24.1</log4j.version>
-
+		<exec.version>3.5.0</exec.version>
+		<slf4j.version>2.24.2</slf4j.version>
 	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -166,12 +161,18 @@
 			<artifactId>log4j-api</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
 
 	</dependencies>
 
@@ -351,12 +352,57 @@
 							</descriptorRefs>
 							<archive>
 								<manifest>
-									<mainClass>managment.app.ManagmentSwingApp.main</mainClass>
+									<mainClass>
+										managment.app.ManagmentSwingApp
+									</mainClass>
+									<addClasspath>true</addClasspath>
 								</manifest>
 							</archive>
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>${exec.version}</version>
+				<configuration>
+					<mainClass>managment.app.ManagmentSwingApp</mainClass>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.34.1</version>
+				<configuration>
+					<images>
+						<image>
+							<name>mysql:${mysql.version}</name>
+							<run>
+								<ports>
+									<port>3306:3306</port>
+								</ports>
+								<volumes>
+									<bind>
+										<volume>./mysql:/var/lib/mysql</volume>
+									</bind>
+								</volumes>
+								<env>
+									<MYSQL_ROOT_PASSWORD>root</MYSQL_ROOT_PASSWORD>
+									<MYSQL_DATABASE>managment</MYSQL_DATABASE>
+									<MYSQL_USER>order-manager</MYSQL_USER>
+									<MYSQL_PASSWORD>mysecret</MYSQL_PASSWORD>
+								</env>
+								<wait>
+									<tcp>
+										<ports>3306</ports>
+									</tcp>
+									<time>30000</time>
+								</wait>
+							</run>
+						</image>
+					</images>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
