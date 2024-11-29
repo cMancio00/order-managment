@@ -168,13 +168,13 @@
 			<artifactId>log4j-api</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
@@ -378,6 +378,40 @@
 				<version>${exec.version}</version>
 				<configuration>
 					<mainClass>managment.app.ManagmentSwingApp</mainClass>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.34.1</version>
+				<configuration>
+					<images>
+						<image>
+							<name>mysql:${mysql.version}</name>
+							<run>
+								<ports>
+									<port>3306:3306</port>
+								</ports>
+								<volumes>
+									<bind>
+										<volume>./mysql:/var/lib/mysql</volume>
+									</bind>
+								</volumes>
+								<env>
+									<MYSQL_ROOT_PASSWORD>root</MYSQL_ROOT_PASSWORD>
+									<MYSQL_DATABASE>managment</MYSQL_DATABASE>
+									<MYSQL_USER>order-manager</MYSQL_USER>
+									<MYSQL_PASSWORD>mysecret</MYSQL_PASSWORD>
+								</env>
+								<wait>
+									<tcp>
+										<ports>3306</ports>
+									</tcp>
+									<time>30000</time>
+								</wait>
+							</run>
+						</image>
+					</images>
 				</configuration>
 			</plugin>
 		</plugins>
