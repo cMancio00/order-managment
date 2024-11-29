@@ -39,9 +39,10 @@ import managment.view.ManagmentView;
 class ControllerServiceIT {
 
 	private static String mysqlVersion = System.getProperty("mysql.version", "9.1.0");
+
 	@SuppressWarnings({ "rawtypes", "resource" })
 	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(DockerImageName.parse("mysql:" + mysqlVersion))
-			.withDatabaseName("Controller-Service-db").withUsername("manager").withPassword("it").withReuse(true);
+			.withDatabaseName("test-db").withUsername("manager").withPassword("test");
 
 	private static final LocalDateTime TEST_DATE = LocalDate.of(2024, Month.JANUARY, 1).atStartOfDay();
 	

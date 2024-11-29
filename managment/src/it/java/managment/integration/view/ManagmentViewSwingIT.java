@@ -41,8 +41,8 @@ public class ManagmentViewSwingIT extends AssertJSwingJUnitTestCase {
 	@ClassRule
 	@SuppressWarnings({ "rawtypes", "resource" })
 	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(
-			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("ViewIT-db").withUsername("manager")
-			.withPassword("it").withReuse(true);
+			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("test-db").withUsername("manager")
+			.withPassword("test");
 
 	private static SessionFactory sessionFactory;
 	private ClientRepository clientRepository;

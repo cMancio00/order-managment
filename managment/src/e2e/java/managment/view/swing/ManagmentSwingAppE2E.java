@@ -41,8 +41,8 @@ public class ManagmentSwingAppE2E extends AssertJSwingJUnitTestCase {
 	@ClassRule
 	@SuppressWarnings({ "rawtypes", "resource" })
 	public static final MySQLContainer mysql = (MySQLContainer) new MySQLContainer(
-			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("e2e-db").withUsername("manager")
-			.withPassword("e2e").withReuse(true);
+			DockerImageName.parse("mysql:" + mysqlVersion)).withDatabaseName("test-db").withUsername("manager")
+			.withPassword("test");
 
 	private static SessionFactory sessionFactory;
 	private ClientRepository clientRepository;
